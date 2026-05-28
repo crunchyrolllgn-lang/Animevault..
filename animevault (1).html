@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌸 AnimeVault</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--accent:#e85d04;--text:#f0e6d3;--bg:#0a0a0a;--card:#141414;--border:#1e1e1e;--sub:#555}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#0d0d0d}::-webkit-scrollbar-thumb{background:#222;border-radius:3px}
+
+#header{background:#0d0d0d;border-bottom:1px solid #1a1a1a;padding:14px 24px;display:flex;align-items:center;position:sticky;top:0;z-index:100}
+#logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--accent)}
+#total{margin-left:auto;font-size:11px;color:#333}
+#lang-select{background:#141414;border:1px solid #2a2a2a;border-radius:6px;color:var(--text);font-size:11px;padding:4px 8px;margin-left:16px;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+#tabbar{display:flex;background:#0d0d0d;border-bottom:1px solid #1a1a1a;overflow-x:auto;padding:0 12px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 14px;background:none;border:none;border-bottom:2px solid transparent;color:#444;cursor:pointer;white-space:nowrap;transition:color .15s;font-family:'DM Sans',sans-serif}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab span{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+
+#content{padding:20px 24px;max-width:920px;margin:0 auto}
+.pane{display:none}.pane.active{display:block}
+.section-label{font-size:11px;font-weight:700;letter-spacing:2px;color:#333;text-transform:uppercase;margin-bottom:14px}
+
+/* FILTER */
+.filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-btn{display:flex;align-items:center;gap:5px;background:#141414;border:1px solid #2a2a2a;border-radius:7px;padding:7px 12px;cursor:pointer;font-size:11px;font-weight:600;color:#666;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.filter-btn:hover{border-color:#3a3a3a;color:#999}
+.filter-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(232,93,4,.08)}
+.filter-divider{width:1px;height:22px;background:#222;flex-shrink:0}
+.genre-wrap{position:relative}
+.genre-dropdown{position:absolute;top:calc(100% + 6px);left:0;background:#161616;border:1px solid #2a2a2a;border-radius:10px;padding:12px;z-index:80;box-shadow:0 8px 32px #000c;min-width:320px;display:none}
+.genre-dropdown.show{display:block}
+.genre-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
+.genre-chip{padding:5px 8px;border-radius:5px;background:#1e1e1e;border:1px solid #2a2a2a;font-size:10px;font-weight:600;color:#555;cursor:pointer;text-align:center;transition:all .15s}
+.genre-chip:hover{background:#2a2a2a;color:#888}
+.genre-chip.selected{background:rgba(232,93,4,.12);border-color:var(--accent);color:var(--accent)}
+.genre-clear{margin-top:8px;padding-top:8px;border-top:1px solid #1e1e1e;display:flex;justify-content:flex-end}
+.genre-clear button{background:none;border:none;color:#444;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* SEARCH */
+.search-wrap{position:relative;margin-bottom:18px}
+.search-icon-pos{position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none}
+.search-input{width:100%;padding:11px 14px 11px 36px;background:#141414;border:1px solid #2a2a2a;border-radius:8px;color:var(--text);font-size:14px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s}
+.search-input:focus{border-color:var(--accent)}
+.dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;overflow:hidden;z-index:60;box-shadow:0 8px 24px #000a;display:none;max-height:300px;overflow-y:auto}
+.dropdown.show{display:block}
+.drop-item{padding:10px 14px;cursor:pointer;font-size:13px;color:var(--text);border-bottom:1px solid #1e1e1e;display:flex;align-items:center;gap:10px}
+.drop-item:last-child{border-bottom:none}
+.drop-item:hover{background:#222}
+.drop-item img{width:32px;height:44px;object-fit:cover;border-radius:3px;flex-shrink:0;background:#222}
+.drop-item-info{flex:1;min-width:0}
+.drop-item-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drop-item-meta{font-size:10px;color:#555;margin-top:1px}
+.drop-spinner{padding:14px;text-align:center;color:#444;font-size:12px}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:border-color .2s;position:relative}
+.card:hover{border-color:#2a2a2a}
+.card.long-press{border-color:var(--accent)!important;background:rgba(232,93,4,.05)}
+.card-body{flex:1;min-width:0;cursor:pointer}
+.card-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-meta{font-size:11px;color:#555;display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:2px}
+.card-film{display:flex;align-items:center;gap:3px;color:#666}
+.card-continuation{display:flex;align-items:center;gap:4px;color:var(--accent);font-size:11px;margin-top:3px}
+.genre-tag{font-size:9px;padding:2px 6px;border-radius:3px;background:#1e1e1e;color:#555;border:1px solid #2a2a2a}
+.card-actions{display:flex;gap:5px;flex-shrink:0}
+.btn-icon{background:#1e1e1e;border:none;border-radius:6px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s}
+.btn-icon:hover{background:#2a2a2a}
+.btn-check{background:var(--accent);border:none;border-radius:6px;padding:5px 10px;cursor:pointer;color:#fff;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.btn-start{background:rgba(45,198,83,.12);border:1px solid rgba(45,198,83,.3);border-radius:6px;padding:5px 10px;cursor:pointer;color:#2dc653;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;white-space:nowrap}
+
+/* STREAMING LOGOS */
+.stream-logos{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
+.stream-badge{position:relative;display:inline-flex;align-items:center}
+.stream-logo{width:22px;height:22px;border-radius:4px;object-fit:contain;cursor:pointer;border:1px solid #2a2a2a;background:#1a1a1a;padding:2px}
+.stream-tooltip{position:absolute;bottom:calc(100%+4px);left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid #333;border-radius:5px;padding:4px 8px;font-size:10px;color:var(--text);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:90}
+.stream-tooltip.dub-info{font-size:9px;color:var(--accent)}
+.stream-badge:hover .stream-tooltip{opacity:1}
+.stream-badge.show-dub .stream-tooltip{opacity:1}
+
+/* CONTEXT MENU */
+.ctx-menu{position:fixed;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:6px;z-index:300;box-shadow:0 8px 24px #000c;display:none;min-width:160px}
+.ctx-menu.show{display:block}
+.ctx-item{padding:8px 12px;cursor:pointer;font-size:13px;color:var(--text);border-radius:5px;display:flex;align-items:center;gap:8px}
+.ctx-item:hover{background:#222}
+.ctx-item.danger{color:#e63946}
+.ctx-item.danger:hover{background:rgba(230,57,70,.1)}
+
+/* RANK */
+.rank-badge{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0}
+.fav-stats{font-size:10px;color:#555;display:flex;gap:10px;flex-wrap:wrap;margin-top:2px}
+.fav-avg{color:var(--accent)}
+
+/* OVERLAYS */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.overlay.show{display:flex}
+.modal{background:#161616;border:1px solid #2a2a2a;border-radius:12px;padding:24px;max-width:420px;width:100%;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+.modal-sub{font-size:13px;color:#666;margin-bottom:20px}
+.modal-sub b{color:var(--text)}
+.modal-actions{display:flex;gap:8px}
+.btn-primary{background:var(--accent);border:none;border-radius:7px;padding:10px 18px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;flex:1;font-family:'DM Sans',sans-serif}
+.btn-secondary{background:#1e1e1e;border:none;border-radius:7px;padding:10px 18px;color:#888;font-size:13px;cursor:pointer;flex:1;font-family:'DM Sans',sans-serif}
+.btn-rate{background:transparent;border:1px solid rgba(232,93,4,.3);border-radius:6px;padding:5px 10px;cursor:pointer;color:var(--accent);font-size:11px;font-weight:600;font-family:'DM Sans',sans-serif}
+.rating-label{font-size:11px;color:#555;margin-bottom:6px}
+.stars{display:flex;gap:5px;margin-bottom:16px;cursor:pointer}
+.rating-avg{font-size:11px;color:#444;margin-bottom:20px}
+
+/* ANIME DETAIL MODAL */
+.detail-cover{width:100%;height:180px;object-fit:cover;border-radius:8px;margin-bottom:14px;background:#1a1a1a}
+.detail-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
+.detail-meta{font-size:12px;color:#666;margin-bottom:10px;display:flex;gap:12px;flex-wrap:wrap}
+.detail-genres{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.detail-genre-tag{font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(232,93,4,.12);color:var(--accent);border:1px solid rgba(232,93,4,.3)}
+.detail-desc{font-size:13px;color:#888;line-height:1.6;margin-bottom:14px}
+.detail-stream-title{font-size:11px;font-weight:700;letter-spacing:1px;color:#444;text-transform:uppercase;margin-bottom:8px}
+.detail-stream-logos{display:flex;gap:8px;flex-wrap:wrap}
+.detail-stream-item{display:flex;flex-direction:column;align-items:center;gap:4px}
+.detail-stream-logo{width:36px;height:36px;border-radius:6px;object-fit:contain;border:1px solid #2a2a2a;background:#1a1a1a;padding:3px}
+.detail-stream-name{font-size:9px;color:#555}
+.detail-dub{font-size:10px;color:var(--accent);margin-top:2px}
+
+/* SETTINGS */
+.settings-box{background:#141414;border:1px solid #1e1e1e;border-radius:10px;padding:20px;max-width:480px;margin-bottom:16px}
+.settings-label{font-size:10px;color:#444;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+.color-swatches{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.swatch{width:30px;height:30px;border-radius:50%;cursor:pointer;outline:3px solid transparent;outline-offset:2px;transition:outline .15s}
+.color-custom{display:flex;align-items:center;gap:8px;font-size:11px;color:#444}
+.settings-preview{margin-top:20px;padding:14px;background:#0f0f0f;border-radius:8px}
+
+.empty{color:#333;font-size:12px;margin-top:8px}
+.no-results{text-align:center;padding:28px;color:#333;font-size:12px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid var(--accent);color:var(--text);padding:9px 20px;border-radius:8px;font-size:12px;font-weight:600;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.6);white-space:nowrap;display:none}
+.loading-spinner{display:inline-block;width:12px;height:12px;border:2px solid #333;border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div id="logo">🌸 AnimeVault</div>
+  <select id="lang-select" onchange="setLang(this.value)">
+    <option value="de">🇩🇪 Deutsch</option>
+    <option value="at">🇦🇹 Österreichisch</option>
+    <option value="ch">🇨🇭 Schweizerdeutsch</option>
+    <option value="en-gb">🇬🇧 English (UK)</option>
+    <option value="en-us">🇺🇸 English (US)</option>
+    <option value="fr">🇫🇷 Français</option>
+    <option value="es">🇪🇸 Español</option>
+    <option value="it">🇮🇹 Italiano</option>
+    <option value="pl">🇵🇱 Polski</option>
+    <option value="nl">🇳🇱 Nederlands</option>
+    <option value="pt">🇵🇹 Português</option>
+    <option value="ru">🇷🇺 Русский</option>
+    <option value="tr">🇹🇷 Türkçe</option>
+    <option value="ja">🇯🇵 日本語</option>
+    <option value="zh">🇨🇳 中文</option>
+  </select>
+  <div id="total"></div>
+</div>
+
+<div id="tabbar">
+  <button class="tab active" data-tab="completed" onclick="switchTab('completed')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+    <span data-i18n="tab_completed">Abgeschlossen</span>
+  </button>
+  <button class="tab" data-tab="ongoing" onclick="switchTab('ongoing')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+    <span data-i18n="tab_ongoing">Schau ich gerade</span>
+  </button>
+  <button class="tab" data-tab="watchlist" onclick="switchTab('watchlist')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <span data-i18n="tab_watchlist">Watchlist</span>
+  </button>
+  <button class="tab" data-tab="favorites" onclick="switchTab('favorites')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="8 21 12 17 16 21"/><line x1="12" y1="17" x2="12" y2="11"/><path d="M7 4H17l-1 7a5 5 0 0 1-8 0L7 4z"/><path d="M5 4H3l1 5a4 4 0 0 0 3 3"/><path d="M19 4h2l-1 5a4 4 0 0 1-3 3"/></svg>
+    <span data-i18n="tab_favorites">Favoriten</span>
+  </button>
+  <button class="tab" data-tab="recommendations" onclick="switchTab('recommendations')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+    <span data-i18n="tab_recommendations">Empfehlungen</span>
+  </button>
+  <button class="tab" data-tab="settings" onclick="switchTab('settings')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <span data-i18n="tab_settings">Design</span>
+  </button>
+</div>
+
+<div id="content">
+  <!-- COMPLETED -->
+  <div class="pane active" id="pane-completed">
+    <div class="section-label" id="label-completed"></div>
+    <div class="filter-bar">
+      <button class="filter-btn active" id="sort-az" onclick="setSort('az')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="9" x2="21" y2="9"/><polyline points="8,15 3,9 8,3"/><line x1="21" y1="15" x2="12" y2="15"/><line x1="21" y1="21" x2="9" y2="21"/></svg>
+        <span data-i18n="sort_az">A – Z</span>
+      </button>
+      <button class="filter-btn" id="sort-ep" onclick="setSort('ep')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        <span data-i18n="sort_ep">Folgen</span>
+      </button>
+      <div class="filter-divider"></div>
+      <div class="genre-wrap">
+        <button class="filter-btn" id="genre-btn" onclick="toggleGenreDD()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          <span data-i18n="filter_genre">Genre</span>
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="genre-dropdown" id="genre-dropdown">
+          <div class="genre-grid" id="genre-grid"></div>
+          <div class="genre-clear"><button onclick="clearGenres()" data-i18n="clear_genres">Alle zurücksetzen</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon-pos"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <input class="search-input" id="search-completed" autocomplete="off" oninput="handleSearch('completed',this.value)" data-i18n-placeholder="search_add">
+      <div class="dropdown" id="drop-completed"></div>
+    </div>
+    <div id="list-completed"></div>
+  </div>
+
+  <!-- ONGOING -->
+  <div class="pane" id="pane-ongoing">
+    <div class="section-label" id="label-ongoing"></div>
+    <div class="search-wrap">
+      <span class="search-icon-pos"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <input class="search-input" id="search-ongoing" autocomplete="off" oninput="handleSearch('ongoing',this.value)" data-i18n-placeholder="search_add_ongoing">
+      <div class="dropdown" id="drop-ongoing"></div>
+    </div>
+    <div id="list-ongoing"></div>
+  </div>
+
+  <!-- WATCHLIST -->
+  <div class="pane" id="pane-watchlist">
+    <div class="section-label" id="label-watchlist"></div>
+    <div class="search-wrap">
+      <span class="search-icon-pos"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <input class="search-input" id="search-watchlist" autocomplete="off" oninput="handleSearch('watchlist',this.value)" data-i18n-placeholder="search_add_watchlist">
+      <div class="dropdown" id="drop-watchlist"></div>
+    </div>
+    <div id="list-watchlist"></div>
+  </div>
+
+  <!-- FAVORITES -->
+  <div class="pane" id="pane-favorites">
+    <div class="section-label" data-i18n="ranking_label">Ranking nach Bewertung</div>
+    <div class="search-wrap">
+      <span class="search-icon-pos"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <input class="search-input" id="search-favorites" autocomplete="off" oninput="handleSearch('favorites',this.value)" data-i18n-placeholder="search_add_fav">
+      <div class="dropdown" id="drop-favorites"></div>
+    </div>
+    <div id="list-favorites"></div>
+  </div>
+
+  <!-- RECOMMENDATIONS -->
+  <div class="pane" id="pane-recommendations">
+    <div class="section-label" data-i18n="rec_label">Empfehlungen für Einsteiger</div>
+    <div style="font-size:11px;color:#333;margin-bottom:14px" data-i18n="rec_sub">Deine persönliche Liste für Freunde, die neu mit Anime anfangen</div>
+    <div class="search-wrap">
+      <span class="search-icon-pos"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <input class="search-input" id="search-recommendations" autocomplete="off" oninput="handleSearch('recommendations',this.value)" data-i18n-placeholder="search_add_rec">
+      <div class="dropdown" id="drop-recommendations"></div>
+    </div>
+    <div id="list-recommendations"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="pane" id="pane-settings">
+    <div class="section-label" data-i18n="settings_label">Design Einstellungen</div>
+    <div class="settings-box">
+      <div style="margin-bottom:22px">
+        <div class="settings-label" data-i18n="accent_label">Akzentfarbe</div>
+        <div class="color-swatches" id="accent-swatches"></div>
+        <div class="color-custom"><span data-i18n="custom_color">Eigene Farbe</span><input type="color" id="accent-custom" style="width:38px;height:26px;border:none;background:none;cursor:pointer" oninput="setAccent(this.value)"></div>
+      </div>
+      <div>
+        <div class="settings-label" data-i18n="text_label">Textfarbe</div>
+        <div class="color-swatches" id="text-swatches"></div>
+        <div class="color-custom"><span data-i18n="custom_color">Eigene Farbe</span><input type="color" id="text-custom" style="width:38px;height:26px;border:none;background:none;cursor:pointer" oninput="setTextColor(this.value)"></div>
+      </div>
+      <div class="settings-preview">
+        <div style="font-size:10px;color:#333;margin-bottom:6px" data-i18n="preview">Vorschau</div>
+        <div id="preview-title" style="font-size:14px;font-weight:600">Demon Slayer</div>
+        <div style="font-size:11px;color:#555;margin-top:2px">55 Folgen · Film: Mugen Train</div>
+        <div id="preview-accent" style="font-size:11px;margin-top:2px">↻ Season 4 läuft</div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:#2a2a2a;margin-top:8px">Dub-Stand: Mai 2026</div>
+  </div>
+</div>
+
+<!-- CONTEXT MENU -->
+<div class="ctx-menu" id="ctx-menu">
+  <div class="ctx-item" id="ctx-detail" onclick="ctxDetail()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span data-i18n="ctx_info">Info</span>
+  </div>
+  <div class="ctx-item danger" id="ctx-delete" onclick="ctxDelete()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+    <span data-i18n="ctx_delete">Löschen</span>
+  </div>
+</div>
+
+<!-- CONFIRM DONE -->
+<div class="overlay" id="overlay-confirm">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" data-i18n="confirm_title">Wirklich abgeschlossen?</div>
+    <div class="modal-sub">Hast du <b id="confirm-name"></b> wirklich komplett durchgeschaut?</div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="confirmDone()" data-i18n="yes_done">Ja, fertig!</button>
+      <button class="btn-secondary" onclick="closeOverlay('overlay-confirm')" data-i18n="no_back">Nein, zurück</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM START -->
+<div class="overlay" id="overlay-start">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" data-i18n="start_title">Jetzt anfangen?</div>
+    <div class="modal-sub"><span data-i18n="start_sub">Anime in "Schau ich gerade" verschieben?</span><br><b id="start-name"></b></div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="confirmStart()" data-i18n="yes_start">Ja, jetzt!</button>
+      <button class="btn-secondary" onclick="closeOverlay('overlay-start')" data-i18n="no_back">Nein, zurück</button>
+    </div>
+  </div>
+</div>
+
+<!-- ANIME DETAIL -->
+<div class="overlay" id="overlay-detail">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:500px">
+    <div id="detail-content"><div style="text-align:center;padding:40px"><div class="loading-spinner"></div></div></div>
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="btn-secondary" onclick="closeOverlay('overlay-detail')" data-i18n="close">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<!-- RATING -->
+<div class="overlay" id="overlay-rating">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:360px">
+    <div class="modal-title" data-i18n="rate_title">Bewertung</div>
+    <div class="modal-sub" id="rating-name" style="margin-bottom:18px"></div>
+    <div class="rating-label" data-i18n="rate_art">Zeichenstil</div>
+    <div class="stars" id="stars-style"></div>
+    <div class="rating-label" data-i18n="rate_story">Story</div>
+    <div class="stars" id="stars-story"></div>
+    <div class="rating-label" data-i18n="rate_catchy">Wie catchy</div>
+    <div class="stars" id="stars-catchy"></div>
+    <div class="rating-avg" id="rating-avg"></div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="saveRating()" data-i18n="save">Speichern</button>
+      <button class="btn-secondary" onclick="closeOverlay('overlay-rating')" data-i18n="cancel">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// I18N
+// ═══════════════════════════════════════════════════════════════════════════════
+const I18N = {
+  de:    {tab_completed:"Abgeschlossen",tab_ongoing:"Schau ich gerade",tab_watchlist:"Watchlist",tab_favorites:"Favoriten",tab_recommendations:"Empfehlungen",tab_settings:"Design",sort_az:"A – Z",sort_ep:"Folgen",filter_genre:"Genre",clear_genres:"Zurücksetzen",search_add:"Anime hinzufügen...",search_add_ongoing:"Laufenden Anime hinzufügen...",search_add_watchlist:"Zur Watchlist hinzufügen...",search_add_fav:"Favoriten hinzufügen...",search_add_rec:"Empfehlung hinzufügen...",ranking_label:"Ranking nach Bewertung",rec_label:"Empfehlungen für Einsteiger",rec_sub:"Deine Liste für Freunde die neu anfangen",settings_label:"Design Einstellungen",accent_label:"Akzentfarbe",text_label:"Textfarbe",custom_color:"Eigene Farbe",preview:"Vorschau",confirm_title:"Wirklich fertig?",yes_done:"Ja, fertig!",no_back:"Nein, zurück",start_title:"Jetzt anfangen?",start_sub:"Anime in Schau ich gerade verschieben?",yes_start:"Ja, jetzt!",rate_title:"Bewertung",rate_art:"Zeichenstil",rate_story:"Story",rate_catchy:"Wie catchy",save:"Speichern",cancel:"Abbrechen",close:"Schließen",ctx_info:"Info & Beschreibung",ctx_delete:"Löschen",done_q:"Fertig?",start_btn:"Jetzt anfangen",rate_btn:"Bewerten",completed_count:"Anime abgeschlossen",ongoing_count:"Anime laufen gerade",watchlist_count:"Anime auf der Liste",added:"hinzugefügt",completed_moved:"als abgeschlossen markiert",started:"gestartet",deleted:"gelöscht",rated:"Bewertung gespeichert",not_rated:"Noch nicht bewertet",no_filter:"Kein Anime gefunden",episodes:"Folgen",film:"Film",films:"Filme",available_on:"Verfügbar auf",dub_until:"Dub bis"},
+  at:    {tab_completed:"Fertig g'schaut",tab_ongoing:"Schau ich grad",tab_watchlist:"Watchlist",tab_favorites:"Favoriten",tab_recommendations:"Empfehlungen",tab_settings:"Design",sort_az:"A – Z",sort_ep:"Folgen",filter_genre:"Genre",clear_genres:"Zurücksetzen",search_add:"Anime hinzufügen...",search_add_ongoing:"Laufenden Anime hinzufügen...",search_add_watchlist:"Zur Watchlist hinzufügen...",search_add_fav:"Favoriten hinzufügen...",search_add_rec:"Empfehlung hinzufügen...",ranking_label:"Ranking nach Bewertung",rec_label:"Empfehlungen für Einsteiger",rec_sub:"Deine Liste für Freunde die neu anfangen",settings_label:"Design",accent_label:"Akzentfarbe",text_label:"Textfarbe",custom_color:"Eigene Farbe",preview:"Vorschau",confirm_title:"Wirklich fertig?",yes_done:"Jo, fertig!",no_back:"Na, zurück",start_title:"Jetzt anfangen?",start_sub:"Anime verschieben?",yes_start:"Jo, los!",rate_title:"Bewertung",rate_art:"Zeichenstil",rate_story:"Story",rate_catchy:"Wie catchy",save:"Speichern",cancel:"Abbrechen",close:"Schließen",ctx_info:"Info",ctx_delete:"Löschen",done_q:"Fertig?",start_btn:"Jetzt anfangen",rate_btn:"Bewerten",completed_count:"Anime fertig g'schaut",ongoing_count:"Anime laufen grad",watchlist_count:"Anime auf der Liste",added:"hinzugefügt",completed_moved:"fertig g'schaut",started:"angefangen",deleted:"gelöscht",rated:"Bewertung gespeichert",not_rated:"Noch nicht bewertet",no_filter:"Nix gefunden",episodes:"Folgen",film:"Film",films:"Filme",available_on:"Verfügbar auf",dub_until:"Dub bis"},
+  ch:    {tab_completed:"Abegluegt",tab_ongoing:"Schau grad",tab_watchlist:"Watchlist",tab_favorites:"Favoriten",tab_recommendations:"Empfehlungen",tab_settings:"Design",sort_az:"A – Z",sort_ep:"Folge",filter_genre:"Genre",clear_genres:"Zerücksetze",search_add:"Anime hinzuefüege...",search_add_ongoing:"Laufende Anime hinzuefüege...",search_add_watchlist:"Zur Watchlist hinzuefüege...",search_add_fav:"Favoriten hinzuefüege...",search_add_rec:"Empfehlig hinzuefüege...",ranking_label:"Ranking",rec_label:"Empfehlunge für Aaafänger",rec_sub:"Dini Liste für Fründe wo neu aaafange",settings_label:"Design",accent_label:"Akzentfarb",text_label:"Textfarb",custom_color:"Eigeni Farb",preview:"Vorschau",confirm_title:"Würklech fertig?",yes_done:"Jo, fertig!",no_back:"Nei, zrugg",start_title:"Jetzt aaafange?",start_sub:"Verschiebe?",yes_start:"Jo, los!",rate_title:"Bewertig",rate_art:"Zeichestil",rate_story:"Story",rate_catchy:"Wie catchy",save:"Speichere",cancel:"Abbreche",close:"Schliesse",ctx_info:"Info",ctx_delete:"Lösche",done_q:"Fertig?",start_btn:"Aaafange",rate_btn:"Bewerte",completed_count:"Anime abegluegt",ongoing_count:"Anime laufe grad",watchlist_count:"Anime uf de Liste",added:"hinzuegfüegt",completed_moved:"fertig",started:"aaagfange",deleted:"glöscht",rated:"Bewertig gespeicheret",not_rated:"No nöd bewertet",no_filter:"Nüt gfunde",episodes:"Folge",film:"Film",films:"Filme",available_on:"Verfüegbar uf",dub_until:"Dub bis"},
+  "en-gb":{tab_completed:"Completed",tab_ongoing:"Watching",tab_watchlist:"Watchlist",tab_favorites:"Favourites",tab_recommendations:"Recommendations",tab_settings:"Design",sort_az:"A – Z",sort_ep:"Episodes",filter_genre:"Genre",clear_genres:"Clear all",search_add:"Add anime...",search_add_ongoing:"Add ongoing anime...",search_add_watchlist:"Add to watchlist...",search_add_fav:"Add favourite...",search_add_rec:"Add recommendation...",ranking_label:"Ranking by Rating",rec_label:"Recommendations for Beginners",rec_sub:"Your personal list for friends who are just starting out",settings_label:"Design Settings",accent_label:"Accent Colour",text_label:"Text Colour",custom_color:"Custom colour",preview:"Preview",confirm_title:"Really finished?",yes_done:"Yes, done!",no_back:"No, go back",start_title:"Start now?",start_sub:"Move anime to Watching?",yes_start:"Yes, start!",rate_title:"Rating",rate_art:"Art Style",rate_story:"Story",rate_catchy:"How catchy",save:"Save",cancel:"Cancel",close:"Close",ctx_info:"Info & Description",ctx_delete:"Delete",done_q:"Done?",start_btn:"Start now",rate_btn:"Rate",completed_count:"anime completed",ongoing_count:"anime watching",watchlist_count:"anime on list",added:"added",completed_moved:"marked as completed",started:"started",deleted:"deleted",rated:"Rating saved",not_rated:"Not yet rated",no_filter:"No anime found",episodes:"Episodes",film:"Film",films:"Films",available_on:"Available on",dub_until:"Dub until"},
+  "en-us":{tab_completed:"Completed",tab_ongoing:"Watching",tab_watchlist:"Watchlist",tab_favorites:"Favorites",tab_recommendations:"Recommendations",tab_settings:"Design",sort_az:"A – Z",sort_ep:"Episodes",filter_genre:"Genre",clear_genres:"Clear all",search_add:"Add anime...",search_add_ongoing:"Add ongoing anime...",search_add_watchlist:"Add to watchlist...",search_add_fav:"Add favorite...",search_add_rec:"Add recommendation...",ranking_label:"Ranking by Rating",rec_label:"Recommendations for Beginners",rec_sub:"Your personal list for friends just getting into anime",settings_label:"Design Settings",accent_label:"Accent Color",text_label:"Text Color",custom_color:"Custom color",preview:"Preview",confirm_title:"Really done?",yes_done:"Yes, done!",no_back:"No, go back",start_title:"Start now?",start_sub:"Move anime to Watching?",yes_start:"Yes, start!",rate_title:"Rating",rate_art:"Art Style",rate_story:"Story",rate_catchy:"How catchy",save:"Save",cancel:"Cancel",close:"Close",ctx_info:"Info & Description",ctx_delete:"Delete",done_q:"Done?",start_btn:"Start now",rate_btn:"Rate",completed_count:"anime completed",ongoing_count:"anime watching",watchlist_count:"anime on list",added:"added",completed_moved:"marked as completed",started:"started",deleted:"deleted",rated:"Rating saved",not_rated:"Not yet rated",no_filter:"No anime found",episodes:"Episodes",film:"Film",films:"Films",available_on:"Available on",dub_until:"Dub until"},
+  fr:    {tab_completed:"Terminés",tab_ongoing:"En cours",tab_watchlist:"À regarder",tab_favorites:"Favoris",tab_recommendations:"Recommandations",tab_settings:"Design",sort_az:"A – Z",sort_ep:"Épisodes",filter_genre:"Genre",clear_genres:"Tout effacer",search_add:"Ajouter un anime...",search_add_ongoing:"Ajouter un anime en cours...",search_add_watchlist:"Ajouter à la liste...",search_add_fav:"Ajouter aux favoris...",search_add_rec:"Ajouter une recommandation...",ranking_label:"Classement par note",rec_label:"Recommandations pour débutants",rec_sub:"Ta liste pour les amis qui débutent",settings_label:"Paramètres de design",accent_label:"Couleur d'accentuation",text_label:"Couleur du texte",custom_color:"Couleur personnalisée",preview:"Aperçu",confirm_title:"Vraiment terminé?",yes_done:"Oui, terminé!",no_back:"Non, retour",start_title:"Commencer maintenant?",start_sub:"Déplacer vers En cours?",yes_start:"Oui, commencer!",rate_title:"Évaluation",rate_art:"Style artistique",rate_story:"Histoire",rate_catchy:"Accrocheur",save:"Enregistrer",cancel:"Annuler",close:"Fermer",ctx_info:"Info & Description",ctx_delete:"Supprimer",done_q:"Terminé?",start_btn:"Commencer",rate_btn:"Évaluer",completed_count:"anime terminés",ongoing_count:"anime en cours",watchlist_count:"anime à regarder",added:"ajouté",completed_moved:"marqué terminé",started:"commencé",deleted:"supprimé",rated:"Note enregistrée",not_rated:"Pas encore noté",no_filter:"Aucun anime trouvé",episodes:"Épisodes",film:"Film",films:"Films",available_on:"Disponible sur",dub_until:"Dub jusqu'à"},
+  es:    {tab_completed:"Completados",tab_ongoing:"Viendo",tab_watchlist:"Por ver",tab_favorites:"Favoritos",tab_recommendations:"Recomendaciones",tab_settings:"Diseño",sort_az:"A – Z",sort_ep:"Episodios",filter_genre:"Género",clear_genres:"Limpiar",search_add:"Añadir anime...",search_add_ongoing:"Añadir anime en curso...",search_add_watchlist:"Añadir a la lista...",search_add_fav:"Añadir favorito...",search_add_rec:"Añadir recomendación...",ranking_label:"Ranking por Puntuación",rec_label:"Recomendaciones para Principiantes",rec_sub:"Tu lista para amigos que empiezan",settings_label:"Ajustes de Diseño",accent_label:"Color de acento",text_label:"Color de texto",custom_color:"Color personalizado",preview:"Vista previa",confirm_title:"¿Realmente terminado?",yes_done:"¡Sí, terminado!",no_back:"No, volver",start_title:"¿Empezar ahora?",start_sub:"¿Mover a Viendo?",yes_start:"¡Sí, empezar!",rate_title:"Valoración",rate_art:"Estilo artístico",rate_story:"Historia",rate_catchy:"Qué pegadizo",save:"Guardar",cancel:"Cancelar",close:"Cerrar",ctx_info:"Info y descripción",ctx_delete:"Eliminar",done_q:"¿Hecho?",start_btn:"Empezar ahora",rate_btn:"Valorar",completed_count:"anime completados",ongoing_count:"anime en curso",watchlist_count:"anime en la lista",added:"añadido",completed_moved:"marcado completado",started:"empezado",deleted:"eliminado",rated:"Valoración guardada",not_rated:"Sin valorar",no_filter:"No se encontró anime",episodes:"Episodios",film:"Película",films:"Películas",available_on:"Disponible en",dub_until:"Dub hasta"},
+  it:    {tab_completed:"Completati",tab_ongoing:"In visione",tab_watchlist:"Da vedere",tab_favorites:"Preferiti",tab_recommendations:"Consigli",tab_settings:"Design",sort_az:"A – Z",sort_ep:"Episodi",filter_genre:"Genere",clear_genres:"Cancella tutto",search_add:"Aggiungi anime...",search_add_ongoing:"Aggiungi anime in corso...",search_add_watchlist:"Aggiungi alla lista...",search_add_fav:"Aggiungi preferito...",search_add_rec:"Aggiungi consiglio...",ranking_label:"Classifica per Voto",rec_label:"Consigli per Principianti",rec_sub:"La tua lista per gli amici alle prime armi",settings_label:"Impostazioni Design",accent_label:"Colore accento",text_label:"Colore testo",custom_color:"Colore personalizzato",preview:"Anteprima",confirm_title:"Davvero finito?",yes_done:"Sì, finito!",no_back:"No, torna",start_title:"Iniziare ora?",start_sub:"Spostare in In visione?",yes_start:"Sì, inizia!",rate_title:"Valutazione",rate_art:"Stile artistico",rate_story:"Trama",rate_catchy:"Quanto è accattivante",save:"Salva",cancel:"Annulla",close:"Chiudi",ctx_info:"Info e descrizione",ctx_delete:"Elimina",done_q:"Finito?",start_btn:"Inizia ora",rate_btn:"Vota",completed_count:"anime completati",ongoing_count:"anime in corso",watchlist_count:"anime in lista",added:"aggiunto",completed_moved:"segnato completato",started:"iniziato",deleted:"eliminato",rated:"Voto salvato",not_rated:"Non ancora valutato",no_filter:"Nessun anime trovato",episodes:"Episodi",film:"Film",films:"Film",available_on:"Disponibile su",dub_until:"Dub fino a"},
+  pl:    {tab_completed:"Ukończone",tab_ongoing:"Oglądane",tab_watchlist:"Do obejrzenia",tab_favorites:"Ulubione",tab_recommendations:"Rekomendacje",tab_settings:"Design",sort_az:"A – Z",sort_ep:"Odcinki",filter_genre:"Gatunek",clear_genres:"Wyczyść",search_add:"Dodaj anime...",search_add_ongoing:"Dodaj aktualnie oglądane...",search_add_watchlist:"Dodaj do listy...",search_add_fav:"Dodaj do ulubionych...",search_add_rec:"Dodaj rekomendację...",ranking_label:"Ranking wg oceny",rec_label:"Rekomendacje dla początkujących",rec_sub:"Twoja lista dla znajomych zaczynających",settings_label:"Ustawienia designu",accent_label:"Kolor akcentu",text_label:"Kolor tekstu",custom_color:"Własny kolor",preview:"Podgląd",confirm_title:"Na pewno ukończone?",yes_done:"Tak, ukończone!",no_back:"Nie, wróć",start_title:"Zacząć teraz?",start_sub:"Przenieść do Oglądanych?",yes_start:"Tak, zacznij!",rate_title:"Ocena",rate_art:"Styl artystyczny",rate_story:"Fabuła",rate_catchy:"Jak wciągające",save:"Zapisz",cancel:"Anuluj",close:"Zamknij",ctx_info:"Info i opis",ctx_delete:"Usuń",done_q:"Ukończone?",start_btn:"Zacznij teraz",rate_btn:"Oceń",completed_count:"ukończonych anime",ongoing_count:"oglądanych anime",watchlist_count:"anime na liście",added:"dodano",completed_moved:"oznaczono jako ukończone",started:"rozpoczęto",deleted:"usunięto",rated:"Ocena zapisana",not_rated:"Jeszcze nie ocenione",no_filter:"Nie znaleziono anime",episodes:"Odcinki",film:"Film",films:"Filmy",available_on:"Dostępne na",dub_until:"Dub do"},
+  nl:    {tab_completed:"Voltooid",tab_ongoing:"Aan het kijken",tab_watchlist:"Kijklijst",tab_favorites:"Favorieten",tab_recommendations:"Aanbevelingen",tab_settings:"Design",sort_az:"A – Z",sort_ep:"Afleveringen",filter_genre:"Genre",clear_genres:"Wis alles",search_add:"Anime toevoegen...",search_add_ongoing:"Lopende anime toevoegen...",search_add_watchlist:"Aan kijklijst toevoegen...",search_add_fav:"Favoriet toevoegen...",search_add_rec:"Aanbeveling toevoegen...",ranking_label:"Ranglijst op beoordeling",rec_label:"Aanbevelingen voor Beginners",rec_sub:"Jouw lijst voor vrienden die beginnen",settings_label:"Design instellingen",accent_label:"Accentkleur",text_label:"Tekstkleur",custom_color:"Aangepaste kleur",preview:"Voorbeeld",confirm_title:"Echt klaar?",yes_done:"Ja, klaar!",no_back:"Nee, terug",start_title:"Nu beginnen?",start_sub:"Verplaatsen naar Aan het kijken?",yes_start:"Ja, beginnen!",rate_title:"Beoordeling",rate_art:"Kunststijl",rate_story:"Verhaal",rate_catchy:"Hoe catchy",save:"Opslaan",cancel:"Annuleren",close:"Sluiten",ctx_info:"Info en beschrijving",ctx_delete:"Verwijderen",done_q:"Klaar?",start_btn:"Nu beginnen",rate_btn:"Beoordelen",completed_count:"anime voltooid",ongoing_count:"anime aan het kijken",watchlist_count:"anime op lijst",added:"toegevoegd",completed_moved:"als voltooid gemarkeerd",started:"begonnen",deleted:"verwijderd",rated:"Beoordeling opgeslagen",not_rated:"Nog niet beoordeeld",no_filter:"Geen anime gevonden",episodes:"Afleveringen",film:"Film",films:"Films",available_on:"Beschikbaar op",dub_until:"Dub tot"},
+  pt:    {tab_completed:"Concluídos",tab_ongoing:"Assistindo",tab_watchlist:"Lista",tab_favorites:"Favoritos",tab_recommendations:"Recomendações",tab_settings:"Design",sort_az:"A – Z",sort_ep:"Episódios",filter_genre:"Género",clear_genres:"Limpar",search_add:"Adicionar anime...",search_add_ongoing:"Adicionar anime em curso...",search_add_watchlist:"Adicionar à lista...",search_add_fav:"Adicionar favorito...",search_add_rec:"Adicionar recomendação...",ranking_label:"Ranking por Avaliação",rec_label:"Recomendações para Iniciantes",rec_sub:"A tua lista para amigos que estão a começar",settings_label:"Definições de Design",accent_label:"Cor de destaque",text_label:"Cor do texto",custom_color:"Cor personalizada",preview:"Pré-visualização",confirm_title:"Realmente concluído?",yes_done:"Sim, concluído!",no_back:"Não, voltar",start_title:"Começar agora?",start_sub:"Mover para Assistindo?",yes_start:"Sim, começar!",rate_title:"Avaliação",rate_art:"Estilo artístico",rate_story:"História",rate_catchy:"Quão cativante",save:"Guardar",cancel:"Cancelar",close:"Fechar",ctx_info:"Info e descrição",ctx_delete:"Eliminar",done_q:"Concluído?",start_btn:"Começar agora",rate_btn:"Avaliar",completed_count:"anime concluídos",ongoing_count:"anime a assistir",watchlist_count:"anime na lista",added:"adicionado",completed_moved:"marcado como concluído",started:"iniciado",deleted:"eliminado",rated:"Avaliação guardada",not_rated:"Ainda não avaliado",no_filter:"Nenhum anime encontrado",episodes:"Episódios",film:"Filme",films:"Filmes",available_on:"Disponível em",dub_until:"Dub até"},
+  ru:    {tab_completed:"Просмотрено",tab_ongoing:"Смотрю",tab_watchlist:"Хочу посмотреть",tab_favorites:"Избранное",tab_recommendations:"Рекомендации",tab_settings:"Дизайн",sort_az:"А – Я",sort_ep:"Эпизоды",filter_genre:"Жанр",clear_genres:"Сбросить",search_add:"Добавить аниме...",search_add_ongoing:"Добавить текущее аниме...",search_add_watchlist:"Добавить в список...",search_add_fav:"Добавить в избранное...",search_add_rec:"Добавить рекомендацию...",ranking_label:"Рейтинг по оценке",rec_label:"Рекомендации для новичков",rec_sub:"Твой список для друзей-новичков",settings_label:"Настройки дизайна",accent_label:"Цвет акцента",text_label:"Цвет текста",custom_color:"Свой цвет",preview:"Предпросмотр",confirm_title:"Действительно завершено?",yes_done:"Да, готово!",no_back:"Нет, назад",start_title:"Начать сейчас?",start_sub:"Переместить в Смотрю?",yes_start:"Да, начать!",rate_title:"Оценка",rate_art:"Стиль рисовки",rate_story:"Сюжет",rate_catchy:"Насколько цепляет",save:"Сохранить",cancel:"Отмена",close:"Закрыть",ctx_info:"Инфо и описание",ctx_delete:"Удалить",done_q:"Готово?",start_btn:"Начать сейчас",rate_btn:"Оценить",completed_count:"аниме просмотрено",ongoing_count:"аниме смотрю",watchlist_count:"аниме в списке",added:"добавлено",completed_moved:"отмечено просмотренным",started:"начато",deleted:"удалено",rated:"Оценка сохранена",not_rated:"Ещё не оценено",no_filter:"Аниме не найдено",episodes:"Эпизоды",film:"Фильм",films:"Фильмы",available_on:"Доступно на",dub_until:"Дублировано до"},
+  tr:    {tab_completed:"Tamamlandı",tab_ongoing:"İzliyorum",tab_watchlist:"İzlenecekler",tab_favorites:"Favoriler",tab_recommendations:"Öneriler",tab_settings:"Tasarım",sort_az:"A – Z",sort_ep:"Bölümler",filter_genre:"Tür",clear_genres:"Temizle",search_add:"Anime ekle...",search_add_ongoing:"Devam eden anime ekle...",search_add_watchlist:"Listeye ekle...",search_add_fav:"Favoriye ekle...",search_add_rec:"Öneri ekle...",ranking_label:"Puana Göre Sıralama",rec_label:"Yeni Başlayanlar İçin Öneriler",rec_sub:"Anime'ye yeni başlayan arkadaşların için listeniz",settings_label:"Tasarım Ayarları",accent_label:"Vurgu rengi",text_label:"Metin rengi",custom_color:"Özel renk",preview:"Önizleme",confirm_title:"Gerçekten bitti mi?",yes_done:"Evet, bitti!",no_back:"Hayır, geri",start_title:"Şimdi başla?",start_sub:"İzliyorum'a taşı?",yes_start:"Evet, başla!",rate_title:"Değerlendirme",rate_art:"Çizim stili",rate_story:"Hikaye",rate_catchy:"Ne kadar çekici",save:"Kaydet",cancel:"İptal",close:"Kapat",ctx_info:"Bilgi ve açıklama",ctx_delete:"Sil",done_q:"Bitti?",start_btn:"Şimdi başla",rate_btn:"Değerlendir",completed_count:"anime tamamlandı",ongoing_count:"anime izleniyor",watchlist_count:"anime listede",added:"eklendi",completed_moved:"tamamlandı olarak işaretlendi",started:"başlandı",deleted:"silindi",rated:"Değerlendirme kaydedildi",not_rated:"Henüz değerlendirilmedi",no_filter:"Anime bulunamadı",episodes:"Bölüm",film:"Film",films:"Filmler",available_on:"Şurada mevcut",dub_until:"Dublaj kadar"},
+  ja:    {tab_completed:"視聴済み",tab_ongoing:"視聴中",tab_watchlist:"ウォッチリスト",tab_favorites:"お気に入り",tab_recommendations:"おすすめ",tab_settings:"デザイン",sort_az:"A – Z",sort_ep:"話数",filter_genre:"ジャンル",clear_genres:"リセット",search_add:"アニメを追加...",search_add_ongoing:"視聴中のアニメを追加...",search_add_watchlist:"リストに追加...",search_add_fav:"お気に入りに追加...",search_add_rec:"おすすめに追加...",ranking_label:"評価ランキング",rec_label:"初心者向けおすすめ",rec_sub:"アニメを始める友人へのリスト",settings_label:"デザイン設定",accent_label:"アクセントカラー",text_label:"テキストカラー",custom_color:"カスタムカラー",preview:"プレビュー",confirm_title:"本当に完了？",yes_done:"はい！",no_back:"いいえ、戻る",start_title:"今すぐ開始？",start_sub:"視聴中に移動？",yes_start:"はい！",rate_title:"評価",rate_art:"作画",rate_story:"ストーリー",rate_catchy:"はまり度",save:"保存",cancel:"キャンセル",close:"閉じる",ctx_info:"情報と説明",ctx_delete:"削除",done_q:"完了？",start_btn:"今すぐ開始",rate_btn:"評価する",completed_count:"本視聴済み",ongoing_count:"本視聴中",watchlist_count:"本リスト中",added:"追加済み",completed_moved:"視聴済みに移動",started:"開始",deleted:"削除",rated:"評価を保存",not_rated:"未評価",no_filter:"見つかりません",episodes:"話",film:"映画",films:"映画",available_on:"配信中",dub_until:"吹替まで"},
+  zh:    {tab_completed:"已看完",tab_ongoing:"正在看",tab_watchlist:"想看",tab_favorites:"收藏",tab_recommendations:"推荐",tab_settings:"设计",sort_az:"A – Z",sort_ep:"集数",filter_genre:"类型",clear_genres:"清除",search_add:"添加动漫...",search_add_ongoing:"添加正在看的动漫...",search_add_watchlist:"添加到列表...",search_add_fav:"添加收藏...",search_add_rec:"添加推荐...",ranking_label:"评分排名",rec_label:"新手推荐",rec_sub:"为刚开始看动漫的朋友准备的列表",settings_label:"设计设置",accent_label:"强调色",text_label:"文字颜色",custom_color:"自定义颜色",preview:"预览",confirm_title:"真的看完了吗？",yes_done:"是的，看完了！",no_back:"不，返回",start_title:"现在开始？",start_sub:"移动到正在看？",yes_start:"是的，开始！",rate_title:"评分",rate_art:"画风",rate_story:"故事",rate_catchy:"吸引力",save:"保存",cancel:"取消",close:"关闭",ctx_info:"简介",ctx_delete:"删除",done_q:"完了？",start_btn:"现在开始",rate_btn:"评分",completed_count:"部动漫已看完",ongoing_count:"部动漫正在看",watchlist_count:"部动漫在列表",added:"已添加",completed_moved:"已标记完成",started:"已开始",deleted:"已删除",rated:"评分已保存",not_rated:"尚未评分",no_filter:"未找到动漫",episodes:"集",film:"电影",films:"电影",available_on:"可在此观看",dub_until:"配音至"},
+};
+let lang = localStorage.getItem('lang') || 'de';
+function t(k){ return (I18N[lang]||I18N.de)[k] || I18N.de[k] || k; }
+function setLang(l){ lang=l; localStorage.setItem('lang',l); applyI18n(); renderAll(); }
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent=t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{ el.placeholder=t(el.dataset.i18nPlaceholder); });
+  document.getElementById('lang-select').value=lang;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// STREAMING INFO
+// ═══════════════════════════════════════════════════════════════════════════════
+const STREAMING = {
+  "Naruto":                 [{id:"cr",dub:"720"},{id:"netflix",dub:"220"}],
+  "Naruto Shippuden":       [{id:"cr",dub:"500"},{id:"netflix",dub:""}],
+  "Death Note":             [{id:"cr",dub:"37"},{id:"netflix",dub:"37"}],
+  "Code Geass":             [{id:"cr",dub:"50"},{id:"netflix",dub:""}],
+  "Fullmetal Alchemist: Brotherhood":[{id:"cr",dub:"64"},{id:"netflix",dub:"64"}],
+  "Attack on Titan":        [{id:"cr",dub:"89"},{id:"netflix",dub:"89"},{id:"prime",dub:""}],
+  "Demon Slayer":           [{id:"cr",dub:"55"},{id:"netflix",dub:"26"},{id:"prime",dub:""}],
+  "Jujutsu Kaisen":         [{id:"cr",dub:"47"},{id:"netflix",dub:""}],
+  "One Piece":              [{id:"cr",dub:"~600"},{id:"netflix",dub:""}],
+  "My Hero Academia":       [{id:"cr",dub:"138"},{id:"netflix",dub:""}],
+  "Sword Art Online":       [{id:"cr",dub:"96"},{id:"netflix",dub:"96"},{id:"prime",dub:""}],
+  "Haikyuu!!":              [{id:"cr",dub:"85"},{id:"netflix",dub:""}],
+  "Black Clover":           [{id:"cr",dub:"170"}],
+  "Dr. Stone":              [{id:"cr",dub:"57"},{id:"netflix",dub:"35"}],
+  "Vinland Saga":           [{id:"cr",dub:"48"},{id:"netflix",dub:"48"},{id:"prime",dub:"48"}],
+  "Tokyo Ghoul":            [{id:"cr",dub:"48"},{id:"netflix",dub:""}],
+  "Hunter x Hunter":        [{id:"cr",dub:"148"},{id:"netflix",dub:""}],
+  "Solo Leveling":          [{id:"cr",dub:"24"}],
+  "Frieren: Beyond Journey's End":[{id:"cr",dub:"28"},{id:"prime",dub:""}],
+  "Dandadan":               [{id:"cr",dub:"13"},{id:"netflix",dub:"13"}],
+  "Blue Lock":              [{id:"cr",dub:"36"},{id:"prime",dub:""}],
+  "Kaiju No. 8":            [{id:"cr",dub:"24"}],
+  "Shangri-La Frontier":    [{id:"cr",dub:"38"}],
+  "Cyberpunk: Edgerunners": [{id:"netflix",dub:"10"}],
+  "Arcane":                 [{id:"netflix",dub:"18"}],
+  "Classroom of the Elite": [{id:"cr",dub:"37"},{id:"prime",dub:""}],
+  "The Rising of the Shield Hero":[{id:"cr",dub:"50"},{id:"prime",dub:""}],
+  "Oshi no Ko":             [{id:"cr",dub:"23"},{id:"prime",dub:""}],
+  "Re:Zero":                [{id:"cr",dub:"50"},{id:"prime",dub:""}],
+  "Mushoku Tensei":         [{id:"cr",dub:"23"},{id:"prime",dub:""}],
+  "Spy x Family":           [{id:"cr",dub:"37"},{id:"prime",dub:""}],
+  "Chainsaw Man":           [{id:"cr",dub:"12"}],
+  "Mob Psycho 100":         [{id:"cr",dub:"37"},{id:"netflix",dub:""}],
+  "Overlord":               [{id:"cr",dub:"52"},{id:"prime",dub:""}],
+  "Made in Abyss":          [{id:"cr",dub:"25"},{id:"prime",dub:""}],
+  "Bunny Girl Senpai":      [{id:"cr",dub:"13"},{id:"prime",dub:""}],
+  "Food Wars":              [{id:"cr",dub:"24"},{id:"netflix",dub:""}],
+  "Kakegurui":              [{id:"cr",dub:"24"},{id:"netflix",dub:"24"}],
+  "Wind Breaker":           [{id:"cr",dub:"25"}],
+  "Gachiakuta":             [{id:"cr",dub:"13"}],
+  "Rising Impact":          [{id:"netflix",dub:"24"}],
+  "Fairy Tail":             [{id:"cr",dub:"~175"},{id:"netflix",dub:""}],
+  "Berserk":                [{id:"cr",dub:"37"},{id:"prime",dub:""}],
+  "JoJo's Bizarre Adventure":[{id:"cr",dub:"73"},{id:"netflix",dub:""}],
+  "Edens Zero":             [{id:"cr",dub:"50"},{id:"netflix",dub:"50"}],
+  "Horimiya":               [{id:"cr",dub:"22"},{id:"disney",dub:""}],
+  "Boruto":                 [{id:"cr",dub:"293"}],
+  "The Seven Deadly Sins":  [{id:"cr",dub:"100"},{id:"netflix",dub:"100"}],
+  "Arifureta":              [{id:"cr",dub:"37"},{id:"prime",dub:""}],
+  "Akame ga Kill!":         [{id:"cr",dub:"24"},{id:"prime",dub:""}],
+  "Seraph of the End":      [{id:"cr",dub:"24"}],
+  "Blue Box":               [{id:"cr",dub:"25"},{id:"netflix",dub:""}],
+  "Witch Hat Atelier":      [{id:"cr",dub:"12"}],
+  "Hell's Paradise":        [{id:"cr",dub:"13"}],
+  "That Time I Got Reincarnated as a Slime":[{id:"cr",dub:"48"},{id:"prime",dub:""}],
+  "Wistoria: Wand and Sword":[{id:"cr",dub:"12"}],
+  "Devil May Cry":          [{id:"netflix",dub:"4"}],
+  "Sentenced to Be a Hero": [{id:"cr",dub:"6"}],
+  "Das Band der Unterwelt": [{id:"cr",dub:"4"}],
+  "Record of Ragnarok":     [{id:"netflix",dub:"24"}],
+  "Lord of Mysteries":      [{id:"cr",dub:"13"}],
+  "Left Hand Layup":        [{id:"cr",dub:"6"}],
+  "Tougen Anki":            [{id:"cr",dub:"13"}],
+  "Dead Mount Death Play":  [{id:"cr",dub:"24"}],
+};
+
+// SVG Icons for streaming providers — no external images needed
+const PROVIDER_SVG = {
+  cr: `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <rect width="40" height="40" rx="8" fill="#f47521"/>
+    <circle cx="20" cy="20" r="13" fill="none" stroke="white" stroke-width="3"/>
+    <circle cx="20" cy="20" r="6" fill="none" stroke="white" stroke-width="3"/>
+    <line x1="20" y1="7" x2="20" y2="14" stroke="#f47521" stroke-width="4"/>
+    <path d="M20 9 Q28 9 33 17" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  </svg>`,
+  netflix: `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <rect width="40" height="40" rx="8" fill="#e50914"/>
+    <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Arial Black,sans-serif" font-weight="900" font-size="26" fill="white">N</text>
+  </svg>`,
+  prime: `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <rect width="40" height="40" rx="8" fill="#00a8e0"/>
+    <text x="50%" y="44%" dominant-baseline="middle" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="9" fill="white">prime</text>
+    <text x="50%" y="68%" dominant-baseline="middle" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="9" fill="white">video</text>
+    <path d="M10 30 Q20 35 30 30" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+    <polygon points="29,28 33,30 29,32" fill="white"/>
+  </svg>`,
+  disney: `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <rect width="40" height="40" rx="8" fill="#113ccf"/>
+    <text x="50%" y="46%" dominant-baseline="middle" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="11" fill="white">Disney</text>
+    <text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" font-family="Arial,sans-serif" font-weight="900" font-size="13" fill="#4fc3f7">+</text>
+  </svg>`,
+};
+
+const PROVIDER_INFO = {
+  cr:      { name:"Crunchyroll", color:"#f47521" },
+  netflix: { name:"Netflix",     color:"#e50914" },
+  prime:   { name:"Prime Video", color:"#00a8e0" },
+  disney:  { name:"Disney+",     color:"#113ccf" },
+};
+
+function getStreamHTML(title, small=true) {
+  const providers = STREAMING[title];
+  if (!providers || !providers.length) return '';
+  const size = small ? 24 : 38;
+  return providers.map(p => {
+    const info = PROVIDER_INFO[p.id];
+    const svg  = PROVIDER_SVG[p.id];
+    if (!info || !svg) return '';
+    const dubText = p.dub ? `${t('dub_until')} Ep. ${p.dub}` : '';
+    if (small) {
+      return `<div class="stream-badge">
+        <div class="stream-logo-svg" style="width:${size}px;height:${size}px;flex-shrink:0;border-radius:6px;overflow:hidden;cursor:pointer">${svg}</div>
+        <div class="stream-tooltip">${info.name}${dubText?`<br><span style="color:var(--accent)">${dubText}</span>`:''}</div>
+      </div>`;
+    } else {
+      return `<div class="detail-stream-item">
+        <div style="width:${size}px;height:${size}px;border-radius:8px;overflow:hidden">${svg}</div>
+        <div class="detail-stream-name">${info.name}</div>
+        ${dubText?`<div class="detail-dub">${dubText}</div>`:''}
+      </div>`;
+    }
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GENRE MAP
+// ═══════════════════════════════════════════════════════════════════════════════
+const GENRES = ["Action","Abenteuer","Fantasy","Isekai","Shonen","Seinen","Sci-Fi","Sport","Romance","Comedy","Thriller","Supernatural","Slice of Life","Horror","Psychologisch","Kampfsport","Musik"];
+const ANIME_GENRES = {
+  "Shangri-La Frontier":["Action","Isekai","Fantasy","Shonen"],"Code Geass":["Action","Sci-Fi","Thriller","Psychologisch","Seinen"],"Naruto":["Action","Abenteuer","Fantasy","Shonen"],"Solo Leveling":["Action","Fantasy","Isekai"],"Vinland Saga":["Action","Abenteuer","Seinen"],"Die Tagebücher der Apothekerin":["Fantasy","Romance","Slice of Life"],"The Water Magician":["Fantasy","Action","Isekai"],"Death Note":["Thriller","Psychologisch","Supernatural","Seinen"],"Orient":["Action","Fantasy","Shonen"],"Fire Force":["Action","Supernatural","Shonen"],"Classroom of the Elite":["Psychologisch","Thriller","Seinen"],"Tokyo Ghoul":["Action","Horror","Supernatural","Seinen"],"Gachiakuta":["Action","Abenteuer","Shonen"],"Kaiju No. 8":["Action","Sci-Fi","Shonen"],"Haikyuu!!":["Sport","Shonen","Comedy"],"Blue Lock":["Sport","Action","Psychologisch","Shonen"],"The Quintessential Quintuplets":["Romance","Comedy"],"The World's Finest Assassin":["Action","Fantasy","Isekai"],"Wind Breaker":["Action","Kampfsport","Shonen"],"Sword Art Online":["Action","Fantasy","Isekai","Sci-Fi"],"The 7th Prince":["Fantasy","Comedy","Isekai"],"Kuroko's Basketball":["Sport","Shonen"],"Seraph of the End":["Action","Fantasy","Supernatural","Shonen"],"Demon Slayer":["Action","Fantasy","Supernatural","Shonen"],"Bunny Girl Senpai":["Romance","Supernatural","Psychologisch"],"The Rising of the Shield Hero":["Action","Fantasy","Isekai"],"Boruto":["Action","Fantasy","Shonen"],"I've Been Killing Slimes for 300 Years":["Fantasy","Isekai","Comedy","Slice of Life"],"Dandadan":["Action","Comedy","Supernatural","Romance","Shonen"],"Arcane":["Action","Fantasy","Abenteuer","Thriller"],"Akame ga Kill!":["Action","Fantasy","Thriller","Seinen"],"Rising Impact":["Sport","Shonen"],"Kakegurui":["Psychologisch","Thriller","Seinen"],"Blue Box":["Sport","Romance","Shonen"],"The Seven Deadly Sins":["Action","Fantasy","Abenteuer","Shonen"],"Reincarnated as a Sword":["Action","Fantasy","Isekai","Comedy"],"Suzume":["Abenteuer","Fantasy","Romance"],"Cyberpunk: Edgerunners":["Action","Sci-Fi","Thriller","Seinen"],"Hunter x Hunter":["Action","Abenteuer","Fantasy","Shonen"],"Edens Zero":["Action","Abenteuer","Sci-Fi","Fantasy","Shonen"],"Akashic Records of Bastard Magic Instructor":["Action","Fantasy","Comedy"],"Horimiya":["Romance","Slice of Life","Comedy"],"Avatar: Der Herr der Elemente + Korra":["Action","Abenteuer","Fantasy"],"Arifureta":["Action","Fantasy","Isekai"],"Jujutsu Kaisen":["Action","Fantasy","Supernatural","Shonen"],"Tougen Anki":["Action","Supernatural","Shonen"],"Dead Mount Death Play":["Action","Supernatural","Thriller","Seinen"],"Black Clover":["Action","Fantasy","Shonen"],"Dr. Stone":["Abenteuer","Sci-Fi","Comedy","Shonen"],"Wistoria: Wand and Sword":["Action","Fantasy","Shonen"],"Oshi no Ko":["Thriller","Psychologisch","Supernatural","Seinen"],"Devil May Cry":["Action","Fantasy","Supernatural"],"Frieren: Beyond Journey's End":["Fantasy","Abenteuer","Slice of Life","Seinen"],"That Time I Got Reincarnated as a Slime":["Action","Fantasy","Isekai","Comedy"],"Hell's Paradise":["Action","Fantasy","Supernatural","Seinen"],"Food Wars":["Comedy","Slice of Life","Shonen"],"Lord of Mysteries":["Fantasy","Thriller","Psychologisch","Seinen"],"Witch Hat Atelier":["Fantasy","Abenteuer"],"Das Band der Unterwelt":["Action","Fantasy","Supernatural"],"Sentenced to Be a Hero":["Action","Fantasy","Isekai"],"My Dress-Up Darling":["Romance","Comedy","Slice of Life"],"Made in Abyss":["Abenteuer","Fantasy","Seinen"],"Fairy Tail":["Action","Fantasy","Abenteuer","Shonen"],"Attack on Titan":["Action","Fantasy","Thriller","Seinen"],"Berserk":["Action","Fantasy","Horror","Seinen"],"Left Hand Layup":["Sport","Shonen"],"JoJo's Bizarre Adventure":["Action","Supernatural","Abenteuer","Seinen"],"One Piece":["Action","Abenteuer","Fantasy","Shonen","Comedy"],"Chainsaw Man":["Action","Supernatural","Horror","Seinen"],"Record of Ragnarok":["Action","Supernatural","Kampfsport","Seinen"],
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════════════════
+const INIT_COMPLETED = [
+  {id:1,title:"Shangri-La Frontier",episodes:38,films:[]},
+  {id:2,title:"Code Geass",episodes:50,films:[]},
+  {id:3,title:"Naruto",episodes:720,films:["mehrere Filme"]},
+  {id:4,title:"Solo Leveling",episodes:24,films:[]},
+  {id:5,title:"Vinland Saga",episodes:48,films:[]},
+  {id:6,title:"Die Tagebücher der Apothekerin",episodes:24,films:[]},
+  {id:7,title:"The Water Magician",episodes:13,films:[]},
+  {id:8,title:"Death Note",episodes:37,films:[]},
+  {id:9,title:"Orient",episodes:24,films:[]},
+  {id:10,title:"Fire Force",episodes:48,films:[]},
+  {id:11,title:"Classroom of the Elite",episodes:37,films:[]},
+  {id:12,title:"Tokyo Ghoul",episodes:48,films:[]},
+  {id:13,title:"Gachiakuta",episodes:13,films:[]},
+  {id:14,title:"Kaiju No. 8",episodes:24,films:[]},
+  {id:15,title:"Haikyuu!!",episodes:85,films:["Das Duell der Müllhalde"]},
+  {id:16,title:"Blue Lock",episodes:36,films:["Episode Nagi"]},
+  {id:17,title:"The Quintessential Quintuplets",episodes:24,films:["Der Film"]},
+  {id:18,title:"The World's Finest Assassin",episodes:12,films:[]},
+  {id:19,title:"Wind Breaker",episodes:25,films:[]},
+  {id:20,title:"Sword Art Online",episodes:96,films:["Ordinal Scale"]},
+  {id:21,title:"The 7th Prince",episodes:12,films:[]},
+  {id:22,title:"Kuroko's Basketball",episodes:75,films:["Last Game"]},
+  {id:23,title:"Seraph of the End",episodes:24,films:[]},
+  {id:24,title:"Demon Slayer",episodes:55,films:["Mugen Train (fehlt noch)"]},
+  {id:25,title:"Bunny Girl Senpai",episodes:13,films:["Dreaming Girl"]},
+  {id:26,title:"The Rising of the Shield Hero",episodes:50,films:[]},
+  {id:27,title:"Boruto",episodes:293,films:["Naruto the Movie"]},
+  {id:28,title:"I've Been Killing Slimes for 300 Years",episodes:12,films:[]},
+  {id:29,title:"Dandadan",episodes:13,films:[]},
+  {id:30,title:"Arcane",episodes:18,films:[]},
+  {id:31,title:"Akame ga Kill!",episodes:24,films:[]},
+  {id:32,title:"Rising Impact",episodes:24,films:[]},
+  {id:33,title:"Kakegurui",episodes:24,films:["Midas Touch"]},
+  {id:34,title:"Blue Box",episodes:25,films:[]},
+  {id:35,title:"The Seven Deadly Sins",episodes:100,films:[]},
+  {id:36,title:"Reincarnated as a Sword",episodes:12,films:[]},
+  {id:37,title:"Suzume",episodes:0,films:["Suzume"]},
+  {id:38,title:"Cyberpunk: Edgerunners",episodes:10,films:[]},
+  {id:39,title:"Hunter x Hunter",episodes:148,films:[]},
+  {id:40,title:"Edens Zero",episodes:50,films:[]},
+  {id:41,title:"Akashic Records of Bastard Magic Instructor",episodes:13,films:[]},
+  {id:42,title:"Horimiya",episodes:22,films:[]},
+  {id:43,title:"Avatar: Der Herr der Elemente + Korra",episodes:232,films:[]},
+  {id:44,title:"Arifureta",episodes:37,films:[]},
+  {id:45,title:"Jujutsu Kaisen",episodes:47,films:["JJK 0"]},
+  {id:46,title:"Tougen Anki",episodes:13,films:[]},
+  {id:47,title:"Dead Mount Death Play",episodes:24,films:[]},
+];
+const INIT_ONGOING = [
+  {id:101,title:"Black Clover",episodes:170,films:["Sword of the Wizard King"],continuation:"Season 2 angekündigt (2026)"},
+  {id:102,title:"Dr. Stone",episodes:69,films:[],continuation:"Season 4 Part 3 läuft"},
+  {id:103,title:"Wistoria: Wand and Sword",episodes:12,films:[],continuation:"Season 2 angekündigt"},
+  {id:104,title:"Oshi no Ko",episodes:23,films:[],continuation:"Season 3 in Produktion"},
+  {id:105,title:"Devil May Cry",episodes:4,films:[],continuation:"Season 1 läuft (2025)"},
+  {id:106,title:"Frieren: Beyond Journey's End",episodes:28,films:[],continuation:"Season 2 angekündigt"},
+  {id:107,title:"That Time I Got Reincarnated as a Slime",episodes:74,films:["Scarlet Bond"],continuation:"Season 3 abgeschlossen"},
+];
+const INIT_WATCHLIST = [
+  {id:201,title:"Hell's Paradise",episodes:13,films:[]},
+  {id:202,title:"Food Wars",episodes:86,films:[]},
+  {id:203,title:"Lord of Mysteries",episodes:26,films:[]},
+  {id:204,title:"Witch Hat Atelier",episodes:12,films:[]},
+  {id:205,title:"Das Band der Unterwelt",episodes:12,films:[]},
+  {id:206,title:"Sentenced to Be a Hero",episodes:13,films:[]},
+  {id:207,title:"My Dress-Up Darling",episodes:12,films:[]},
+  {id:208,title:"Made in Abyss",episodes:25,films:[]},
+  {id:209,title:"Fairy Tail",episodes:328,films:["Dragon Cry"]},
+  {id:210,title:"Attack on Titan",episodes:89,films:[]},
+  {id:211,title:"Berserk",episodes:37,films:[]},
+  {id:212,title:"Left Hand Layup",episodes:12,films:[]},
+  {id:213,title:"JoJo's Bizarre Adventure",episodes:190,films:[]},
+  {id:214,title:"One Piece",episodes:1100,films:["Film: Red"]},
+  {id:215,title:"Chainsaw Man",episodes:12,films:[]},
+  {id:216,title:"Record of Ragnarok",episodes:24,films:[]},
+];
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════════════
+let state = {
+  completed:       ld('completed',INIT_COMPLETED),
+  ongoing:         ld('ongoing',INIT_ONGOING),
+  watchlist:       ld('watchlist',INIT_WATCHLIST),
+  favorites:       ld('favorites',[]),
+  recommendations: ld('recommendations',[]),
+  accentColor:     localStorage.getItem('accent')||'#e85d04',
+  textColor:       localStorage.getItem('textcol')||'#f0e6d3',
+};
+let sortMode='az', selectedGenres=[];
+let ctxTarget=null, ctxList=null;
+let confirmTarget=null, startTarget=null;
+let ratingTarget=null, currentRating={style:0,story:0,catchy:0};
+
+function ld(k,def){try{const s=localStorage.getItem('av_'+k);return s?JSON.parse(s):def;}catch{return def;}}
+function sv(k){localStorage.setItem('av_'+k,JSON.stringify(state[k]));}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ICONS
+// ═══════════════════════════════════════════════════════════════════════════════
+const IC_FILM=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>`;
+const IC_REFRESH=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>`;
+const IC_PLUS=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+const STAR_F=(c)=>`<svg width="24" height="24" viewBox="0 0 24 24" fill="${c}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ANIME SUMMARIES (shown instantly, before AniList loads)
+// ═══════════════════════════════════════════════════════════════════════════════
+const SUMMARIES = {
+  "Shangri-La Frontier": "Ryuusei Sunraku ist ein Gamer der sich auf Trash-Games spezialisiert hat. Als er das top-rated VR-MMO Shangri-La Frontier betritt, stößt er auf einen legendären Bug-Boss den noch niemand besiegt hat.",
+  "Code Geass": "Lelouch vi Britannia erhält die Macht Geass – die Fähigkeit jeden zu kontrollieren. Als der verbannte Prinz nutzt er diese Kraft um das Britannische Imperium zu stürzen und seinen Schwur an seine Schwester zu erfüllen.",
+  "Naruto": "Naruto Uzumaki träumt davon, Hokage seines Dorfes zu werden – obwohl er als Kind des Neun-Schwänze-Fuchses gefürchtet wird. Seine Reise führt ihn durch Kämpfe, Verluste und unzählige Prüfungen.",
+  "Solo Leveling": "Sung Jinwoo ist der schwächste Hunter der Welt. Nach einem beinahe tödlichen Dungeon-Zwischenfall bekommt er als einziger Mensch die Fähigkeit, sein Level zu erhöhen – und wird zur stärksten Macht der Erde.",
+  "Vinland Saga": "Thorfinn wächst unter Wikingern auf und sucht Rache an dem Mann der seinen Vater tötete – Askeladd. Eine brutal ehrliche Geschichte über Krieg, Rache und die Suche nach einem wahren Krieger.",
+  "Die Tagebücher der Apothekerin": "Maomao, eine Apothekerin-Tochter, wird in den kaiserlichen Palast verschleppt. Ihre außergewöhnlichen Kenntnisse in Medizin und Giften bringen sie schnell ins Rampenlicht des gefährlichen Hoflebens.",
+  "Death Note": "Light Yagami findet ein übernatürliches Notizbuch: Wer darin steht, stirbt. Er beginnt als gottgleicher Richter die Welt von Verbrechern zu säubern – während der Detektiv L ihn jagt.",
+  "Fire Force": "In einer Welt wo Menschen spontan zu Feuer-Dämonen werden kämpft die Spezial-Feuerwehr dagegen an. Shinra Kusakabe sucht die Wahrheit über den Tod seiner Familie und das Geheimnis hinter den Infernos.",
+  "Classroom of the Elite": "An der Elite-Schule Koudo Ikusei werden Schüler nach ihrer Leistung in Klassen eingeteilt. Kiyotaka Ayanokoji verbirgt sein wahres Genie während er die Machenschaften seiner Klasse aus dem Hintergrund lenkt.",
+  "Tokyo Ghoul": "Ken Kaneki überlebt ein Date mit einer Ghul und wird selbst zu einem Halb-Ghul. Zwischen zwei Welten zerrissen muss er lernen in einer Gesellschaft zu überleben die Ghule vernichten will.",
+  "Gachiakuta": "Rudo wird zu Unrecht für ein Verbrechen verurteilt und in die riesige Mülldeponie unter der Stadt geworfen. Dort kämpft er ums Überleben und entdeckt eine dunkle Wahrheit über die Gesellschaft über ihm.",
+  "Kaiju No. 8": "Kafka Hibino träumt davon Kaiju-Kämpfer zu werden, scheitert aber an den Tests. Ein unerwartetes Ereignis lässt ihn zur mächtigsten Kaiju-Bedrohung werden – während er versucht seinen Traum trotzdem zu verfolgen.",
+  "Haikyuu!!": "Shoyo Hinata ist klein aber explosiv schnell. Trotz seiner geringen Körpergröße will er der beste Volleyball-Spieler Japans werden und schließt sich ausgerechnet mit seinem Erzrivalen zusammen.",
+  "Blue Lock": "Japan will die WM gewinnen. Dazu werden 300 talentierte Stürmer in einem radikalen Programm gegeneinander ausgespielt – nur der egozentrischste, tödlichste Stürmer wird übrig bleiben.",
+  "The Quintessential Quintuplets": "Fuutarou Uesugi soll fünf identische Quintuplett-Schwestern unterrichten – die alle null Interesse am Lernen haben. Eine Romanze entfaltet sich, und eine der fünf wird seine zukünftige Braut.",
+  "The World's Finest Assassin": "Der weltbeste Assassin wird nach seinem Tod in eine Fantasy-Welt reinkarniert mit einem Auftrag: Den Helden zu töten bevor er die Welt vernichtet. Er baut ein Assassinen-Imperium auf.",
+  "Wind Breaker": "Haruka Sakura wechselt auf eine Schule voller Schläger. Was er nicht weiß: Die Schüler kämpfen nicht für sich selbst, sondern schützen ihre Stadt. Eine Geschichte über wahre Stärke und Gemeinschaft.",
+  "Sword Art Online": "10.000 Spieler werden in einem VR-Spiel gefangen – wer in-game stirbt, stirbt in der Realität. Kirito kämpft allein durch 100 Ebenen um alle zu befreien.",
+  "Kuroko's Basketball": "Kuroko ist ein nahezu unsichtbarer Spieler – sein Fehlen der Präsenz macht ihn unberechenbar. Gemeinsam mit dem überbegabten Kagami wollen sie die legendäre Generation of Miracles besiegen.",
+  "Seraph of the End": "Nach einem Virus tötet alle Erwachsenen übernehmen Vampire die Welt. Yuichiro schwört Rache und schließt sich der Armee an – doch die Wahrheit hinter der Apokalypse ist noch dunkler.",
+  "Demon Slayer": "Tanjiro Kamados Familie wird von einem Dämon abgeschlachtet, seine Schwester Nezuko in einen verwandelt. Er wird Dämonentöter um sie zu heilen – in einer Welt voller mächtiger Feinde.",
+  "Bunny Girl Senpai": "Sakuta Azusagawa trifft ein Mädchen im Hasenkostüm das niemand außer ihm sehen kann. Ein mysteriöses Phänomen namens Adoleszenz-Syndrom verbindet die beiden in einer ruhigen aber tiefgründigen Romanze.",
+  "The Rising of the Shield Hero": "Naofumi wird in eine Fantasywelt gerufen als einer von vier Helden – und sofort als Verbrecher verleumdet. Mit minimaler Unterstützung kämpft er sich durch eine feindliche Welt nach oben.",
+  "Boruto": "Boruto ist der Sohn des legendären Hokage Naruto und kämpft mit dem Schatten seines Vaters. Eine neue Bedrohung aus dem Dunkel verändert sein Schicksal für immer.",
+  "Dandadan": "Momo glaubt an Übernatürliches aber nicht an Aliens. Okarun glaubt an Aliens aber nicht an Geister. Nach einem Experiment sind beide verflucht – und müssen zusammenarbeiten um zu überleben.",
+  "Arcane": "In der Stadt Piltover schwelt ein Konflikt zwischen der Oberschicht und den Armen im Untergrund. Die Geschichte der Schwestern Vi und Jinx – und wie Magie und Technologie alles zerstören.",
+  "Akame ga Kill!": "Tatsumi schließt sich der Assassinen-Gruppe Night Raid an um die korrupte Hauptstadt zu stürzen. In einer brutalen Welt sterben Helden – und niemand ist vor dem Tod sicher.",
+  "Kakegurui": "An der Hyakkaou-Privatakademie bestimmt Glücksspiel den sozialen Status. Yumeko Jabami kommt neu an – und ist süchtig nach dem Rausch des Risikos, egal wie hoch der Einsatz.",
+  "The Seven Deadly Sins": "Die sieben mächtigsten Ritter des Königreichs wurden verbannt. Prinzessin Elizabeth sucht sie um das Königreich vor einem Coup zu retten. Eine epische Fantasy-Abenteuergeschichte.",
+  "Cyberpunk: Edgerunners": "David Martinez verliert alles in der brutalen Megastadt Night City. Er wird Edgerunner – ein Söldner mit illegaler Körper-Technologie – in einer Welt wo alles einen Preis hat.",
+  "Hunter x Hunter": "Gon Freecss will Hunter werden wie sein Vater – ein gefährlicher Beruf für Abenteurer, Jäger und Detektive. Seine Freundschaft mit Killua und die dunklen Seiten der Hunter-Welt formen ihn.",
+  "Edens Zero": "Shiki Granbell kennt nur Roboter als Familie. Sein erstes Treffen mit einem echten Menschen bringt ihn auf eine Reise durch das Universum auf der Suche nach der legendären Göttin Edens Zero.",
+  "Horimiya": "Kyouko Hori ist perfekt in der Schule. Izumi Miyamura ist still und zurückgezogen. Außerhalb der Schule sind beide ganz anders – und entdecken eine tiefe Verbindung zueinander.",
+  "Arifureta": "Hajime Nagumo wird mit seiner Klasse in eine Fantasywelt teleportiert. Als schwächstes Mitglied fällt er in den tiefsten Dungeon der Welt – und kämpft sich mit brutaler Effizienz nach oben.",
+  "Jujutsu Kaisen": "Yuji Itadori verschluckt einen Fluchfinger des stärksten Verfluchers Ryomen Sukuna und wird sein Gefäß. Als Jujutsu-Zauberer bekämpft er übernatürliche Flüche – mit Sukuna immer im Hinterkopf.",
+  "Tougen Anki": "Shiki lebt ein normales Leben bis ein Dämon auftaucht und seine Kraft erwacht. Er ist ein Nachkomme alter Linien – und wird in einen Krieg zwischen Menschen und Dämonen hineingezogen.",
+  "Dead Mount Death Play": "Ein mächtiger Nekromant reinkarniert in die Seele eines Mörders in der modernen Welt. Er navigiert das Untergrundmilieu und seine übernatürlichen Kräfte während er die neue Welt entschlüsselt.",
+  "Black Clover": "Asta wird ohne Magie geboren – in einer Welt wo Magie alles ist. Mit purer körperlicher Stärke und Anti-Magie-Schwertern kämpft er darum, der Magierkaiser zu werden.",
+  "Dr. Stone": "Alle Menschen werden zu Stein. 3.700 Jahre später erwacht Senku – ein wissenschaftliches Genie – und will die Zivilisation mit der Kraft der Wissenschaft neu aufbauen.",
+  "Frieren: Beyond Journey's End": "Nach dem Sieg über den Dämonenkönig reist die Elfin Frieren durch die Welt. Als unsterbliche Magierin versteht sie erst jetzt, was die kurzen Leben ihrer Gefährten bedeuteten.",
+  "Oshi no Ko": "Ein Arzt stirbt und reinkarniert als Kind seines Lieblingsidols. Er entdeckt die dunklen Geheimnisse hinter der Idol-Industrie – und die Wahrheit über den Tod seiner Mutter.",
+  "Attack on Titan": "Die Menschheit lebt hinter riesigen Mauern vor titanengroßen Menschenfressern. Eren Yeager schwört Rache als seine Mutter gefressen wird – und entdeckt eine Wahrheit die alles verändert.",
+  "One Piece": "Monkey D. Luffy will Piratenkönig werden. Mit seiner Gummikraft und seiner Crew sucht er das legendäre Schatz-Versteck 'One Piece' in einer Welt voller Abenteuer und Gefahren.",
+  "Chainsaw Man": "Denji lebt in bitterer Armut und arbeitet mit seinem Kettensägen-Teufel-Hund Pochita für die Yakuza. Nach seinem Tod fusioniert er mit Pochita und wird der Kettensägenteufel-Jäger.",
+  "Fairy Tail": "Natsu Dragneel ist ein Drachentöter-Magier der seine Gilde Fairy Tail über alles liebt. Gemeinsam mit Lucy und seinen Freunden kämpft er gegen Dunkle Magier und rettet die Welt – immer mit Lärm.",
+  "Berserk": "Guts, der schwarze Schwertkämpfer, wandert durch eine brutale mittelalterliche Welt auf der Suche nach Rache. Seine Geschichte mit Griffith und dem Band des Falken ist eine der dunkelsten Fantasien überhaupt.",
+  "JoJo's Bizarre Adventure": "Die Joestar-Familie ist durch Generationen hinweg in übernatürliche Kämpfe verwickelt. Jeder JoJo kämpft mit besonderen Kräften gegen einzigartige Feinde in einem immer verrückteren Universum.",
+  "Record of Ragnarok": "Die Götter entscheiden, die Menschheit auszulöschen. Valhalla gibt ihnen eine letzte Chance: 13 Runden Kampf zwischen Göttern und den größten Kriegern der Geschichte.",
+  "Hell's Paradise": "Gabimaru ist ein unzerstörbarer Ninja der zum Tode verurteilt wurde. Er bekommt Begnadigung wenn er das Elixier des ewigen Lebens auf einer Insel voller Monster findet.",
+  "Food Wars": "Soma Yukihira will das beste Restaurant der Welt führen. Er besucht die Elite-Kochschule Totsuki wo Kochwettbewerbe über Aufnahme oder Rauswurf entscheiden – und jedes Gericht ist eine Sensation.",
+  "Made in Abyss": "Riko will in den Abgrund hinabsteigen – einen riesigen Krater voller Wunder und tödlicher Gefahren. Mit dem Roboter Reg beginnt sie eine Reise ohne Rückkehr.",
+  "Wistoria: Wand and Sword": "Will Serfort hat keine Magie – in einer Welt wo Magie alles bestimmt. Er kompensiert mit roher physischer Kraft und einem unerbittlichen Willen.",
+  "Sentenced to Be a Hero": "Xylo Forbartz ist ein Strafheld – ein verurteilter Soldat der gegen Monsterhorden kämpfen muss bis er stirbt. Doch der Kreislauf des Todes und der Wiedergeburt verbirgt ein größeres Geheimnis.",
+  "Das Band der Unterwelt": "Zwei Gruppen mit entgegengesetzten Zielen sind übernatürlich aneinandergebunden. Was als Feindschaft beginnt entwickelt sich zu einer Geschichte über Vertrauen und dunkle Mächte.",
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ANILIST API
+// ═══════════════════════════════════════════════════════════════════════════════
+const ANILIST = 'https://graphql.anilist.co';
+let searchCache = {};
+
+async function searchAniList(query) {
+  if (searchCache[query]) return searchCache[query];
+  const q = `query($s:String){Page(perPage:8){media(search:$s,type:ANIME,sort:SEARCH_MATCH){id title{romaji english}episodes coverImage{medium}averageScore genres description(asHtml:false)}}}`;
+  try {
+    const res = await fetch(ANILIST,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,variables:{s:query}})});
+    const data = await res.json();
+    const results = data?.data?.Page?.media || [];
+    searchCache[query] = results;
+    return results;
+  } catch { return []; }
+}
+
+async function fetchAnimeDetail(title) {
+  const q = `query($s:String){Page(perPage:1){media(search:$s,type:ANIME){id title{romaji english}episodes coverImage{large}averageScore genres description(asHtml:false) startDate{year}}}}`;
+  try {
+    const res = await fetch(ANILIST,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,variables:{s:title}})});
+    const data = await res.json();
+    return data?.data?.Page?.media?.[0] || null;
+  } catch { return null; }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════════════════════════════════════════
+let searchTimers = {};
+function allTitles(){return[...state.completed,...state.ongoing,...state.watchlist,...state.favorites,...state.recommendations].map(x=>x.title.toLowerCase());}
+
+async function handleSearch(tab, val) {
+  const drop = document.getElementById('drop-'+tab);
+  if (!val.trim()) { drop.innerHTML=''; drop.classList.remove('show'); return; }
+  drop.innerHTML = `<div class="drop-spinner"><div class="loading-spinner"></div></div>`;
+  drop.classList.add('show');
+  clearTimeout(searchTimers[tab]);
+  searchTimers[tab] = setTimeout(async () => {
+    const taken = allTitles();
+    const results = await searchAniList(val);
+    if (!results.length) { drop.innerHTML='<div class="drop-spinner">Keine Ergebnisse</div>'; return; }
+    drop.innerHTML = results.filter(r => {
+      const name = r.title.romaji || r.title.english || '';
+      return !taken.includes(name.toLowerCase());
+    }).slice(0,7).map(r => {
+      const name = r.title.romaji || r.title.english || 'Unknown';
+      const ep = r.episodes ? `${r.episodes} Ep.` : '?';
+      const img = r.coverImage?.medium || '';
+      return `<div class="drop-item" onclick="addAnimeFromResult('${tab}','${name.replace(/'/g,"\\'")}',${r.episodes||0})">
+        <img src="${img}" alt="" onerror="this.style.display='none'">
+        <div class="drop-item-info">
+          <div class="drop-item-title">${name}</div>
+          <div class="drop-item-meta">${ep} · ${(r.genres||[]).slice(0,2).join(', ')}</div>
+        </div>
+      </div>`;
+    }).join('') || '<div class="drop-spinner">Keine neuen Ergebnisse</div>';
+  }, 350);
+}
+
+function addAnimeFromResult(tab, title, episodes) {
+  const a={id:Date.now(),title,episodes:episodes||'?',films:[]};
+  if(tab==='ongoing') a.continuation='Läuft gerade';
+  state[tab].push(a); sv(tab);
+  document.getElementById('search-'+tab).value='';
+  const drop=document.getElementById('drop-'+tab);
+  drop.classList.remove('show'); drop.innerHTML='';
+  renderAll(); showToast(`"${title}" ${t('added')}`);
+}
+
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.search-wrap')) document.querySelectorAll('.dropdown').forEach(d=>{d.classList.remove('show');d.innerHTML='';});
+  if(!e.target.closest('.genre-wrap')) document.getElementById('genre-dropdown').classList.remove('show');
+  if(!e.target.closest('.ctx-menu')) hideCtx();
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONTEXT MENU (long press / right click)
+// ═══════════════════════════════════════════════════════════════════════════════
+let pressTimer=null;
+function attachCardEvents(el, id, listKey) {
+  const showCtx=(x,y)=>{
+    ctxTarget=id; ctxList=listKey;
+    const m=document.getElementById('ctx-menu');
+    m.style.left=Math.min(x,window.innerWidth-180)+'px';
+    m.style.top=Math.min(y,window.innerHeight-100)+'px';
+    m.classList.add('show');
+    document.getElementById('ctx-detail').style.display='flex';
+  };
+  el.addEventListener('contextmenu',e=>{e.preventDefault();showCtx(e.clientX,e.clientY);});
+  el.addEventListener('touchstart',e=>{pressTimer=setTimeout(()=>showCtx(e.touches[0].clientX,e.touches[0].clientY),600);},{passive:true});
+  el.addEventListener('touchend',()=>clearTimeout(pressTimer));
+  el.addEventListener('touchmove',()=>clearTimeout(pressTimer));
+  el.addEventListener('click',e=>{
+    if(e.target.closest('.card-actions')||e.target.closest('.stream-logos')) return;
+    openDetail(listKey,id);
+  });
+}
+function hideCtx(){document.getElementById('ctx-menu').classList.remove('show');}
+function ctxDetail(){if(ctxTarget&&ctxList){openDetail(ctxList,ctxTarget);}hideCtx();}
+function ctxDelete(){
+  if(!ctxTarget||!ctxList) return;
+  state[ctxList]=state[ctxList].filter(a=>a.id!==ctxTarget);
+  sv(ctxList); renderAll(); hideCtx();
+  showToast(t('deleted'));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DETAIL MODAL
+// ═══════════════════════════════════════════════════════════════════════════════
+async function openDetail(listKey, id) {
+  const anime = state[listKey]?.find(a=>a.id===id);
+  if (!anime) return;
+
+  // Show local data instantly
+  const localDesc = SUMMARIES[anime.title] || '';
+  const localGenres = ANIME_GENRES[anime.title] || [];
+  const streamH_detail = getStreamHTML(anime.title, false);
+
+  document.getElementById('detail-content').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div id="detail-cover-wrap" style="width:80px;height:112px;border-radius:8px;background:#1a1a1a;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center">
+        <div class="loading-spinner"></div>
+      </div>
+      <div>
+        <div class="detail-title">${anime.title}</div>
+        <div class="detail-meta" id="detail-meta-row">
+          ${anime.episodes>0?`<span>${anime.episodes} ${t('episodes')}</span>`:''}
+        </div>
+        ${localGenres.length?`<div class="detail-genres">${localGenres.map(g=>`<span class="detail-genre-tag">${g}</span>`).join('')}</div>`:''}
+      </div>
+    </div>
+    <div class="detail-desc" id="detail-desc">${localDesc || '<span style="color:#333">Lade Beschreibung...</span>'}</div>
+    ${anime.films&&anime.films.length?`<div style="font-size:11px;color:#666;margin-bottom:10px;display:flex;align-items:center;gap:4px">${IC_FILM} ${anime.films.join(' · ')}</div>`:''}
+    ${anime.continuation?`<div style="font-size:11px;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:4px">${IC_REFRESH} ${anime.continuation}</div>`:''}
+    ${streamH_detail?`<div class="detail-stream-title">${t('available_on')}</div><div class="detail-stream-logos">${streamH_detail}</div>`:''}
+  `;
+  document.getElementById('overlay-detail').classList.add('show');
+
+  // Enrich with AniList in background
+  const data = await fetchAnimeDetail(anime.title);
+  if (!data) return;
+  const cover = data?.coverImage?.large || '';
+  const score = data?.averageScore ? `⭐ ${(data.averageScore/10).toFixed(1)}/10` : '';
+  const year  = data?.startDate?.year || '';
+  const apiDesc = data?.description ? data.description.replace(/<[^>]+>/g,'').slice(0,420)+'…' : '';
+
+  if (cover) {
+    document.getElementById('detail-cover-wrap').innerHTML = `<img src="${cover}" style="width:100%;height:100%;object-fit:cover">`;
+  }
+  const metaRow = document.getElementById('detail-meta-row');
+  if (metaRow) {
+    if (year)  metaRow.innerHTML += `<span>${year}</span>`;
+    if (score) metaRow.innerHTML += `<span>${score}</span>`;
+  }
+  const descEl = document.getElementById('detail-desc');
+  if (descEl && apiDesc && !localDesc) descEl.textContent = apiDesc;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// FILTER
+// ═══════════════════════════════════════════════════════════════════════════════
+function setSort(m){sortMode=m;document.getElementById('sort-az').classList.toggle('active',m==='az');document.getElementById('sort-ep').classList.toggle('active',m==='ep');renderCompleted();}
+function toggleGenreDD(){document.getElementById('genre-dropdown').classList.toggle('show');}
+function buildGenreGrid(){document.getElementById('genre-grid').innerHTML=GENRES.map(g=>`<div class="genre-chip${selectedGenres.includes(g)?' selected':''}" onclick="toggleGenre('${g}')">${g}</div>`).join('');document.getElementById('genre-btn').classList.toggle('active',selectedGenres.length>0);}
+function toggleGenre(g){if(selectedGenres.includes(g))selectedGenres=selectedGenres.filter(x=>x!==g);else selectedGenres.push(g);buildGenreGrid();renderCompleted();}
+function clearGenres(){selectedGenres=[];buildGenreGrid();renderCompleted();}
+
+function applyFilters(list){
+  let r=[...list];
+  if(selectedGenres.length>0) r=r.filter(a=>selectedGenres.every(sg=>(ANIME_GENRES[a.title]||[]).includes(sg)));
+  if(sortMode==='az') r.sort((a,b)=>a.title.localeCompare(b.title));
+  if(sortMode==='ep') r.sort((a,b)=>b.episodes-a.episodes);
+  return r;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════════════════════
+function buildCard(a, listKey, opts={}) {
+  const filmH = a.films&&a.films.length===1
+    ? `<span class="card-film">${IC_FILM} ${a.films[0]}</span>`
+    : a.films&&a.films.length>1
+    ? `<span class="card-film">${IC_FILM} ${a.films.length} ${t('films')}</span>` : '';
+  const contH = a.continuation?`<div class="card-continuation" style="color:${state.accentColor}">${IC_REFRESH} ${a.continuation}</div>`:'';
+  const streamH = getStreamHTML(a.title);
+  const genresH = opts.showGenres && (ANIME_GENRES[a.title]||[]).length
+    ? `<div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:4px">${(ANIME_GENRES[a.title]||[]).map(g=>`<span class="genre-tag">${g}</span>`).join('')}</div>` : '';
+  let actionsH = '';
+  if (opts.showCheck) actionsH += `<button class="btn-check" onclick="event.stopPropagation();askConfirm(${a.id})">${t('done_q')}</button>`;
+  if (opts.showStart) actionsH += `<button class="btn-start" onclick="event.stopPropagation();askStart(${a.id})">${t('start_btn')}</button>`;
+  return `<div class="card" id="card-${listKey}-${a.id}" data-id="${a.id}" data-list="${listKey}">
+    <div class="card-body">
+      <div class="card-title" style="color:${state.textColor}">${a.title}</div>
+      <div class="card-meta">
+        ${a.episodes>0?`<span>${a.episodes} ${t('episodes')}</span>`:''}
+        ${filmH}
+      </div>
+      ${contH}
+      ${streamH?`<div class="stream-logos">${streamH}</div>`:''}
+      ${genresH}
+    </div>
+    <div class="card-actions">${actionsH}</div>
+  </div>`;
+}
+
+function attachAll(listKey) {
+  document.querySelectorAll(`[data-list="${listKey}"]`).forEach(el=>{
+    const id=parseInt(el.dataset.id);
+    attachCardEvents(el,id,listKey);
+  });
+}
+
+function renderCompleted(){
+  const filtered=applyFilters(state.completed);
+  const fa=selectedGenres.length>0;
+  document.getElementById('label-completed').textContent=fa?`${filtered.length} / ${state.completed.length} ${t('completed_count')}`:`${state.completed.length} ${t('completed_count')}`;
+  document.getElementById('list-completed').innerHTML=filtered.length===0
+    ?`<div class="no-results">${t('no_filter')}</div>`
+    :filtered.map(a=>buildCard(a,'completed',{showGenres:fa})).join('');
+  attachAll('completed');
+}
+
+function renderAll(){
+  document.documentElement.style.setProperty('--accent',state.accentColor);
+  document.documentElement.style.setProperty('--text',state.textColor);
+  renderCompleted();
+
+  document.getElementById('label-ongoing').textContent=`${state.ongoing.length} ${t('ongoing_count')}`;
+  document.getElementById('list-ongoing').innerHTML=state.ongoing.map(a=>buildCard(a,'ongoing',{showCheck:true})).join('');
+  attachAll('ongoing');
+
+  document.getElementById('label-watchlist').textContent=`${state.watchlist.length} ${t('watchlist_count')}`;
+  document.getElementById('list-watchlist').innerHTML=state.watchlist.map(a=>buildCard(a,'watchlist',{showStart:true})).join('');
+  attachAll('watchlist');
+
+  const ranked=[...state.favorites].sort((a,b)=>(b.avg||0)-(a.avg||0));
+  const rc=['#d4af37','#9e9e9e','#a0634a'];
+  document.getElementById('list-favorites').innerHTML=ranked.length===0
+    ?`<div class="empty">${t('not_rated')}</div>`
+    :ranked.map((a,i)=>{
+      const bg=i<3?rc[i]:'#1e1e1e',col=i<3?'#000':'#555';
+      const stats=a.avg?`<div class="fav-stats"><span class="fav-avg">${a.avg}/10</span><span>${t('rate_art')} ${a.style}/10</span><span>${t('rate_story')} ${a.story}/10</span><span>${t('rate_catchy')} ${a.catchy}/10</span></div>`:`<div style="font-size:10px;color:#333;margin-top:2px">${t('not_rated')}</div>`;
+      return `<div class="card" data-id="${a.id}" data-list="favorites">
+        <div class="rank-badge" style="background:${bg};color:${col}">${i+1}</div>
+        <div class="card-body"><div class="card-title" style="color:${state.textColor}">${a.title}</div>${stats}</div>
+        <div class="card-actions"><button class="btn-rate" onclick="event.stopPropagation();openRating(${a.id})">${t('rate_btn')}</button></div>
+      </div>`;
+    }).join('');
+  attachAll('favorites');
+
+  document.getElementById('list-recommendations').innerHTML=state.recommendations.length===0
+    ?`<div class="empty">—</div>`
+    :state.recommendations.map((a,i)=>`<div class="card" data-id="${a.id}" data-list="recommendations">
+        <div style="font-size:10px;font-weight:700;color:#333;width:18px;text-align:center;flex-shrink:0">#${i+1}</div>
+        <div class="card-body"><div class="card-title" style="color:${state.textColor}">${a.title}</div>${a.episodes&&a.episodes!=='?'?`<div class="card-meta">${a.episodes} ${t('episodes')}</div>`:''}</div>
+      </div>`).join('');
+  attachAll('recommendations');
+
+  document.getElementById('total').textContent=`${state.completed.length+state.ongoing.length+state.watchlist.length} Anime`;
+  document.querySelectorAll('.tab[data-tab]').forEach(tab=>{
+    const k=tab.dataset.tab;
+    const counts={completed:state.completed.length,ongoing:state.ongoing.length,watchlist:state.watchlist.length,favorites:state.favorites.length,recommendations:state.recommendations.length};
+    const span=tab.querySelector('span');
+    if(counts[k]!==undefined) span.textContent=`${t('tab_'+k)} · ${counts[k]}`;
+    else span.textContent=t('tab_'+k);
+  });
+  document.getElementById('preview-title').style.color=state.textColor;
+  document.getElementById('preview-accent').style.color=state.accentColor;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONFIRM DONE
+// ═══════════════════════════════════════════════════════════════════════════════
+function askConfirm(id){confirmTarget=state.ongoing.find(a=>a.id===id);if(!confirmTarget)return;document.getElementById('confirm-name').textContent=confirmTarget.title;document.getElementById('overlay-confirm').classList.add('show');}
+function confirmDone(){if(!confirmTarget)return;state.ongoing=state.ongoing.filter(a=>a.id!==confirmTarget.id);const d={...confirmTarget};delete d.continuation;state.completed.push(d);sv('ongoing');sv('completed');closeOverlay('overlay-confirm');renderAll();showToast(`"${d.title}" ${t('completed_moved')}`);}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// START NOW
+// ═══════════════════════════════════════════════════════════════════════════════
+function askStart(id){startTarget=state.watchlist.find(a=>a.id===id);if(!startTarget)return;document.getElementById('start-name').textContent=startTarget.title;document.getElementById('overlay-start').classList.add('show');}
+function confirmStart(){if(!startTarget)return;state.watchlist=state.watchlist.filter(a=>a.id!==startTarget.id);const d={...startTarget,continuation:'Gerade angefangen'};state.ongoing.push(d);sv('watchlist');sv('ongoing');closeOverlay('overlay-start');renderAll();showToast(`"${d.title}" ${t('started')}`);}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RATING
+// ═══════════════════════════════════════════════════════════════════════════════
+function openRating(id){ratingTarget=state.favorites.find(a=>a.id===id);if(!ratingTarget)return;currentRating={style:ratingTarget.style||0,story:ratingTarget.story||0,catchy:ratingTarget.catchy||0};document.getElementById('rating-name').textContent=ratingTarget.title;renderStars();updateAvg();document.getElementById('overlay-rating').classList.add('show');}
+function renderStars(){['style','story','catchy'].forEach(k=>{document.getElementById('stars-'+k).innerHTML=[1,2,3,4,5,6,7,8,9,10].map(n=>`<span onclick="setStar('${k}',${n})" style="cursor:pointer;font-size:0">${STAR_F(n<=currentRating[k]?'#FFD700':'#2a2a2a')}</span>`).join('');document.getElementById('stars-'+k).style.flexWrap='wrap';});}
+function setStar(k,v){currentRating[k]=v;renderStars();updateAvg();}
+function updateAvg(){const avg=((currentRating.style+currentRating.story+currentRating.catchy)/3).toFixed(1);document.getElementById('rating-avg').textContent=`Schnitt: ${avg} / 10`;}
+function saveRating(){if(!ratingTarget)return;const avg=parseFloat(((currentRating.style+currentRating.story+currentRating.catchy)/3).toFixed(1));state.favorites=state.favorites.map(a=>a.id===ratingTarget.id?{...a,...currentRating,avg}:a);sv('favorites');closeOverlay('overlay-rating');renderAll();showToast(t('rated'));}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// OVERLAYS
+// ═══════════════════════════════════════════════════════════════════════════════
+function closeOverlay(id){document.getElementById(id).classList.remove('show');}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');}));
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════════════════════════════
+const ACC=['#e85d04','#c1121f','#0077b6','#2dc653','#8338ec','#ff006e','#ffbe0b','#00b4d8'];
+const TXT=['#f0e6d3','#ffffff','#d4d4d4','#a8d8a8','#ffd6a5','#bde0fe','#ffccd5'];
+function buildSwatches(){
+  document.getElementById('accent-swatches').innerHTML=ACC.map(c=>`<div class="swatch${c===state.accentColor?' selected':''}" style="background:${c}" onclick="setAccent('${c}')"></div>`).join('');
+  document.getElementById('text-swatches').innerHTML=TXT.map(c=>`<div class="swatch${c===state.textColor?' selected':''}" style="background:${c};outline-color:${c===state.textColor?state.accentColor:'transparent'}" onclick="setTextCol('${c}')"></div>`).join('');
+  document.getElementById('accent-custom').value=state.accentColor;
+  document.getElementById('text-custom').value=state.textColor;
+}
+function setAccent(c){state.accentColor=c;localStorage.setItem('accent',c);buildSwatches();renderAll();}
+function setTextColor(c){state.textColor=c;localStorage.setItem('textcol',c);buildSwatches();renderAll();}
+function setTextCol(c){setTextColor(c);}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════════════════════════
+function switchTab(tab){document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('pane-'+tab).classList.add('active');document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════════════════════
+let toastTimer=null;
+function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.style.display='block';clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.display='none',2600);}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════════
+buildGenreGrid();
+buildSwatches();
+applyI18n();
+renderAll();
+</script>
+</body>
+</html>
