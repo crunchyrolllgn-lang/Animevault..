@@ -3,146 +3,221 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌸 AnimeVault</title>
+<title>AnimeVault</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--accent:#e85d04;--text:#f0e6d3;--bg:#0a0a0a;--card:#141414;--border:#1e1e1e;--sub:#555}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#0d0d0d}::-webkit-scrollbar-thumb{background:#222;border-radius:3px}
+:root{--accent:#d4688a;--text:#f0e6d3;--bg:#0e0a09;--card:#17100e;--card2:#1f1510;--border:#2e1e18;--border2:#3d2820;--sub:#7a5a52;--branch:#3d1f0a;--petal:#f5c6d0}
+body{background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;min-height:100vh;background-image:radial-gradient(ellipse at 80% 0%,rgba(212,104,138,.06) 0%,transparent 60%),radial-gradient(ellipse at 0% 100%,rgba(61,31,10,.15) 0%,transparent 50%)}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 
-#header{background:#0d0d0d;border-bottom:1px solid #1a1a1a;padding:14px 24px;display:flex;align-items:center;position:sticky;top:0;z-index:100}
-#logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--accent)}
-#total{margin-left:auto;font-size:11px;color:#333}
-#lang-select{background:#141414;border:1px solid #2a2a2a;border-radius:6px;color:var(--text);font-size:11px;padding:4px 8px;margin-left:16px;cursor:pointer;font-family:'DM Sans',sans-serif}
+#header{background:linear-gradient(135deg,#110b09 0%,#1a0f0b 100%);border-bottom:1px solid var(--border2);padding:14px 24px;display:flex;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.4)}
+#logo{display:flex;align-items:center;gap:10px;cursor:default}
+#logo-text{font-family:"Bebas Neue",sans-serif;font-size:22px;letter-spacing:2px;color:var(--accent)}
+#logo-icon{flex-shrink:0}
+#total{margin-left:auto;font-size:11px;color:var(--border2)}
+#lang-select{background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:4px 8px;margin-left:16px;cursor:pointer;font-family:"DM Sans",sans-serif}
 
-#tabbar{display:flex;background:#0d0d0d;border-bottom:1px solid #1a1a1a;overflow-x:auto;padding:0 12px}
-.tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 14px;background:none;border:none;border-bottom:2px solid transparent;color:#444;cursor:pointer;white-space:nowrap;transition:color .15s;font-family:'DM Sans',sans-serif}
+#tabbar{display:flex;background:linear-gradient(180deg,#130d0b 0%,#0e0a09 100%);border-bottom:1px solid var(--border2);overflow-x:auto;padding:0 12px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 14px;background:none;border:none;border-bottom:2px solid transparent;color:var(--sub);cursor:pointer;white-space:nowrap;transition:color .15s;font-family:"DM Sans",sans-serif}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .tab span{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
 
 #content{padding:20px 24px;max-width:920px;margin:0 auto}
 .pane{display:none}.pane.active{display:block}
-.section-label{font-size:11px;font-weight:700;letter-spacing:2px;color:#333;text-transform:uppercase;margin-bottom:14px}
+.section-label{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--border2);text-transform:uppercase;margin-bottom:14px}
 
-/* FILTER */
 .filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.filter-btn{display:flex;align-items:center;gap:5px;background:#141414;border:1px solid #2a2a2a;border-radius:7px;padding:7px 12px;cursor:pointer;font-size:11px;font-weight:600;color:#666;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
-.filter-btn:hover{border-color:#3a3a3a;color:#999}
-.filter-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(232,93,4,.08)}
-.filter-divider{width:1px;height:22px;background:#222;flex-shrink:0}
+.filter-btn{display:flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:7px 12px;cursor:pointer;font-size:11px;font-weight:600;color:var(--sub);font-family:"DM Sans",sans-serif;transition:all .15s;white-space:nowrap}
+.filter-btn:hover{border-color:var(--border2);color:#aaa}
+.filter-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(212,104,138,.08)}
+.filter-divider{width:1px;height:22px;background:var(--border);flex-shrink:0}
 .genre-wrap{position:relative}
-.genre-dropdown{position:absolute;top:calc(100% + 6px);left:0;background:#161616;border:1px solid #2a2a2a;border-radius:10px;padding:12px;z-index:80;box-shadow:0 8px 32px #000c;min-width:320px;display:none}
+.genre-dropdown{position:absolute;top:calc(100% + 6px);left:0;background:#1a100d;border:1px solid var(--border2);border-radius:10px;padding:12px;z-index:80;box-shadow:0 8px 32px rgba(0,0,0,.7);min-width:320px;display:none}
 .genre-dropdown.show{display:block}
 .genre-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
-.genre-chip{padding:5px 8px;border-radius:5px;background:#1e1e1e;border:1px solid #2a2a2a;font-size:10px;font-weight:600;color:#555;cursor:pointer;text-align:center;transition:all .15s}
-.genre-chip:hover{background:#2a2a2a;color:#888}
-.genre-chip.selected{background:rgba(232,93,4,.12);border-color:var(--accent);color:var(--accent)}
-.genre-clear{margin-top:8px;padding-top:8px;border-top:1px solid #1e1e1e;display:flex;justify-content:flex-end}
-.genre-clear button{background:none;border:none;color:#444;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.genre-chip{padding:5px 8px;border-radius:5px;background:var(--card2);border:1px solid var(--border);font-size:10px;font-weight:600;color:var(--sub);cursor:pointer;text-align:center;transition:all .15s}
+.genre-chip:hover{background:var(--border);color:#aaa}
+.genre-chip.selected{background:rgba(212,104,138,.12);border-color:var(--accent);color:var(--accent)}
+.genre-clear{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:flex-end}
+.genre-clear button{background:none;border:none;color:var(--sub);font-size:11px;cursor:pointer;font-family:"DM Sans",sans-serif}
 
-/* SEARCH */
 .search-wrap{position:relative;margin-bottom:18px}
 .search-icon-pos{position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none}
-.search-input{width:100%;padding:11px 14px 11px 36px;background:#141414;border:1px solid #2a2a2a;border-radius:8px;color:var(--text);font-size:14px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s}
+.search-input{width:100%;padding:11px 14px 11px 36px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;font-family:"DM Sans",sans-serif;transition:border-color .2s}
 .search-input:focus{border-color:var(--accent)}
-.dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;overflow:hidden;z-index:60;box-shadow:0 8px 24px #000a;display:none;max-height:300px;overflow-y:auto}
+.dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#1a100d;border:1px solid var(--border2);border-radius:8px;overflow:hidden;z-index:60;box-shadow:0 8px 24px rgba(0,0,0,.7);display:none;max-height:300px;overflow-y:auto}
 .dropdown.show{display:block}
-.drop-item{padding:10px 14px;cursor:pointer;font-size:13px;color:var(--text);border-bottom:1px solid #1e1e1e;display:flex;align-items:center;gap:10px}
+.drop-item{padding:10px 14px;cursor:pointer;font-size:13px;color:var(--text);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
 .drop-item:last-child{border-bottom:none}
-.drop-item:hover{background:#222}
-.drop-item img{width:32px;height:44px;object-fit:cover;border-radius:3px;flex-shrink:0;background:#222}
+.drop-item:hover{background:var(--card2)}
+.drop-item img{width:32px;height:44px;object-fit:cover;border-radius:3px;flex-shrink:0;background:var(--card2)}
 .drop-item-info{flex:1;min-width:0}
 .drop-item-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.drop-item-meta{font-size:10px;color:#555;margin-top:1px}
-.drop-spinner{padding:14px;text-align:center;color:#444;font-size:12px}
+.drop-item-meta{font-size:10px;color:var(--sub);margin-top:1px}
+.drop-spinner{padding:14px;text-align:center;color:var(--sub);font-size:12px}
 
-/* CARD */
-.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:border-color .2s;position:relative}
-.card:hover{border-color:#2a2a2a}
-.card.long-press{border-color:var(--accent)!important;background:rgba(232,93,4,.05)}
-.card-body{flex:1;min-width:0;cursor:pointer}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:border-color .2s,background .2s;position:relative}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:10px 0 0 10px;background:var(--border2);transition:background .2s}
+.card:hover{border-color:var(--border2);background:var(--card2)}
+.card:hover::before{background:var(--accent)}
+.card.long-press{border-color:var(--accent);background:rgba(212,104,138,.05)}
+.card-body{flex:1;min-width:0;cursor:pointer;padding-left:6px}
 .card-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-meta{font-size:11px;color:#555;display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:2px}
-.card-film{display:flex;align-items:center;gap:3px;color:#666}
+.card-meta{font-size:11px;color:var(--sub);display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:2px}
+.card-film{display:flex;align-items:center;gap:3px;color:#8a6a62}
 .card-continuation{display:flex;align-items:center;gap:4px;color:var(--accent);font-size:11px;margin-top:3px}
-.genre-tag{font-size:9px;padding:2px 6px;border-radius:3px;background:#1e1e1e;color:#555;border:1px solid #2a2a2a}
+.genre-tag{font-size:9px;padding:2px 6px;border-radius:3px;background:var(--card2);color:var(--sub);border:1px solid var(--border)}
 .card-actions{display:flex;gap:5px;flex-shrink:0}
-.btn-icon{background:#1e1e1e;border:none;border-radius:6px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s}
-.btn-icon:hover{background:#2a2a2a}
-.btn-check{background:var(--accent);border:none;border-radius:6px;padding:5px 10px;cursor:pointer;color:#fff;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;white-space:nowrap}
-.btn-start{background:rgba(45,198,83,.12);border:1px solid rgba(45,198,83,.3);border-radius:6px;padding:5px 10px;cursor:pointer;color:#2dc653;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.btn-icon{background:var(--card2);border:none;border-radius:6px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s}
+.btn-icon:hover{background:var(--border2)}
+.btn-check{background:var(--accent);border:none;border-radius:6px;padding:5px 10px;cursor:pointer;color:#fff;font-size:11px;font-weight:700;font-family:"DM Sans",sans-serif;white-space:nowrap}
+.btn-start{background:rgba(212,104,138,.12);border:1px solid rgba(212,104,138,.3);border-radius:6px;padding:5px 10px;cursor:pointer;color:var(--accent);font-size:11px;font-weight:700;font-family:"DM Sans",sans-serif;white-space:nowrap}
 
-/* STREAMING LOGOS */
-.stream-logos{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
+.stream-logos{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
 .stream-badge{position:relative;display:inline-flex;align-items:center}
-.stream-logo{width:22px;height:22px;border-radius:4px;object-fit:contain;cursor:pointer;border:1px solid #2a2a2a;background:#1a1a1a;padding:2px}
-.stream-tooltip{position:absolute;bottom:calc(100%+4px);left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid #333;border-radius:5px;padding:4px 8px;font-size:10px;color:var(--text);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:90}
-.stream-tooltip.dub-info{font-size:9px;color:var(--accent)}
+.stream-logo-svg{flex-shrink:0;border-radius:5px;overflow:hidden;cursor:pointer;border:1px solid var(--border)}
+.stream-tooltip{position:absolute;bottom:calc(100%+5px);left:50%;transform:translateX(-50%);background:#1a100d;border:1px solid var(--border2);border-radius:5px;padding:4px 8px;font-size:10px;color:var(--text);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:90}
 .stream-badge:hover .stream-tooltip{opacity:1}
-.stream-badge.show-dub .stream-tooltip{opacity:1}
 
-/* CONTEXT MENU */
-.ctx-menu{position:fixed;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:6px;z-index:300;box-shadow:0 8px 24px #000c;display:none;min-width:160px}
+.ctx-menu{position:fixed;background:#1a100d;border:1px solid var(--border2);border-radius:8px;padding:6px;z-index:300;box-shadow:0 8px 24px rgba(0,0,0,.8);display:none;min-width:160px}
 .ctx-menu.show{display:block}
 .ctx-item{padding:8px 12px;cursor:pointer;font-size:13px;color:var(--text);border-radius:5px;display:flex;align-items:center;gap:8px}
-.ctx-item:hover{background:#222}
+.ctx-item:hover{background:var(--card2)}
 .ctx-item.danger{color:#e63946}
 .ctx-item.danger:hover{background:rgba(230,57,70,.1)}
 
-/* RANK */
 .rank-badge{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;flex-shrink:0}
-.fav-stats{font-size:10px;color:#555;display:flex;gap:10px;flex-wrap:wrap;margin-top:2px}
+.fav-stats{font-size:10px;color:var(--sub);display:flex;gap:10px;flex-wrap:wrap;margin-top:2px}
 .fav-avg{color:var(--accent)}
 
-/* OVERLAYS */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
 .overlay.show{display:flex}
-.modal{background:#161616;border:1px solid #2a2a2a;border-radius:12px;padding:24px;max-width:420px;width:100%;max-height:90vh;overflow-y:auto}
+.modal{background:#1a100d;border:1px solid var(--border2);border-radius:14px;padding:24px;max-width:420px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.8)}
 .modal-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
-.modal-sub{font-size:13px;color:#666;margin-bottom:20px}
+.modal-sub{font-size:13px;color:var(--sub);margin-bottom:20px}
 .modal-sub b{color:var(--text)}
 .modal-actions{display:flex;gap:8px}
-.btn-primary{background:var(--accent);border:none;border-radius:7px;padding:10px 18px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;flex:1;font-family:'DM Sans',sans-serif}
-.btn-secondary{background:#1e1e1e;border:none;border-radius:7px;padding:10px 18px;color:#888;font-size:13px;cursor:pointer;flex:1;font-family:'DM Sans',sans-serif}
-.btn-rate{background:transparent;border:1px solid rgba(232,93,4,.3);border-radius:6px;padding:5px 10px;cursor:pointer;color:var(--accent);font-size:11px;font-weight:600;font-family:'DM Sans',sans-serif}
-.rating-label{font-size:11px;color:#555;margin-bottom:6px}
-.stars{display:flex;gap:5px;margin-bottom:16px;cursor:pointer}
-.rating-avg{font-size:11px;color:#444;margin-bottom:20px}
+.btn-primary{background:var(--accent);border:none;border-radius:8px;padding:10px 18px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;flex:1;font-family:"DM Sans",sans-serif}
+.btn-primary:hover{opacity:.88}
+.btn-secondary{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 18px;color:var(--sub);font-size:13px;cursor:pointer;flex:1;font-family:"DM Sans",sans-serif}
+.btn-rate{background:transparent;border:1px solid rgba(212,104,138,.3);border-radius:6px;padding:5px 10px;cursor:pointer;color:var(--accent);font-size:11px;font-weight:600;font-family:"DM Sans",sans-serif}
+.rating-label{font-size:11px;color:var(--sub);margin-bottom:6px}
+.stars{display:flex;gap:5px;margin-bottom:16px;cursor:pointer;flex-wrap:wrap}
+.rating-avg{font-size:11px;color:var(--border2);margin-bottom:20px}
 
-/* ANIME DETAIL MODAL */
-.detail-cover{width:100%;height:180px;object-fit:cover;border-radius:8px;margin-bottom:14px;background:#1a1a1a}
-.detail-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
-.detail-meta{font-size:12px;color:#666;margin-bottom:10px;display:flex;gap:12px;flex-wrap:wrap}
+.detail-cover{width:100%;height:180px;object-fit:cover;border-radius:8px;margin-bottom:14px;background:var(--card2)}
+.detail-title{font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px}
+.detail-meta{font-size:12px;color:var(--sub);margin-bottom:10px;display:flex;gap:12px;flex-wrap:wrap}
 .detail-genres{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
-.detail-genre-tag{font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(232,93,4,.12);color:var(--accent);border:1px solid rgba(232,93,4,.3)}
-.detail-desc{font-size:13px;color:#888;line-height:1.6;margin-bottom:14px}
-.detail-stream-title{font-size:11px;font-weight:700;letter-spacing:1px;color:#444;text-transform:uppercase;margin-bottom:8px}
+.detail-genre-tag{font-size:10px;padding:3px 8px;border-radius:4px;background:rgba(212,104,138,.12);color:var(--accent);border:1px solid rgba(212,104,138,.3)}
+.detail-desc{font-size:13px;color:#a08878;line-height:1.65;margin-bottom:14px}
+.detail-stream-title{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--sub);text-transform:uppercase;margin-bottom:8px}
 .detail-stream-logos{display:flex;gap:8px;flex-wrap:wrap}
 .detail-stream-item{display:flex;flex-direction:column;align-items:center;gap:4px}
-.detail-stream-logo{width:36px;height:36px;border-radius:6px;object-fit:contain;border:1px solid #2a2a2a;background:#1a1a1a;padding:3px}
-.detail-stream-name{font-size:9px;color:#555}
-.detail-dub{font-size:10px;color:var(--accent);margin-top:2px}
+.detail-stream-name{font-size:9px;color:var(--sub)}
+.detail-dub{font-size:9px;color:var(--accent);margin-top:1px}
 
-/* SETTINGS */
-.settings-box{background:#141414;border:1px solid #1e1e1e;border-radius:10px;padding:20px;max-width:480px;margin-bottom:16px}
-.settings-label{font-size:10px;color:#444;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+.settings-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;max-width:480px;margin-bottom:14px}
+.settings-label{font-size:10px;color:var(--sub);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
 .color-swatches{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .swatch{width:30px;height:30px;border-radius:50%;cursor:pointer;outline:3px solid transparent;outline-offset:2px;transition:outline .15s}
-.color-custom{display:flex;align-items:center;gap:8px;font-size:11px;color:#444}
-.settings-preview{margin-top:20px;padding:14px;background:#0f0f0f;border-radius:8px}
+.color-custom{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--sub)}
+.settings-preview{margin-top:20px;padding:14px;background:var(--card2);border-radius:8px;border:1px solid var(--border)}
 
-.empty{color:#333;font-size:12px;margin-top:8px}
-.no-results{text-align:center;padding:28px;color:#333;font-size:12px}
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid var(--accent);color:var(--text);padding:9px 20px;border-radius:8px;font-size:12px;font-weight:600;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.6);white-space:nowrap;display:none}
-.loading-spinner{display:inline-block;width:12px;height:12px;border:2px solid #333;border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+.empty{color:var(--border2);font-size:12px;margin-top:8px}
+.no-results{text-align:center;padding:28px;color:var(--border2);font-size:12px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a100d;border:1px solid var(--accent);color:var(--text);padding:9px 20px;border-radius:8px;font-size:12px;font-weight:600;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.7);white-space:nowrap;display:none}
+.loading-spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 
 <div id="header">
-  <div id="logo">🌸 AnimeVault</div>
+  <div id="logo">
+    <svg id="logo-icon" width="72" height="48" viewBox="0 0 180 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Gnarled main branch -->
+      <path d="M8 118 C20 105 38 88 60 72 C82 56 108 38 145 22 C158 16 168 13 176 11" stroke="#3d1f0a" stroke-width="6" stroke-linecap="round"/>
+      <path d="M10 118 C22 105 40 88 62 72 C84 56 110 38 147 22" stroke="#6b3515" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+      <!-- Left sub-branch -->
+      <path d="M58 74 C46 56 34 36 22 12" stroke="#3d1f0a" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M60 74 C48 56 36 36 24 12" stroke="#6b3515" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+      <!-- Right sub-branch -->
+      <path d="M114 36 C112 24 110 12 107 3" stroke="#3d1f0a" stroke-width="4" stroke-linecap="round"/>
+      <!-- Drooping branch -->
+      <path d="M84 58 C88 72 89 86 86 100" stroke="#3d1f0a" stroke-width="3.5" stroke-linecap="round"/>
+      <!-- Small twigs -->
+      <path d="M145 22 C148 14 150 8 150 4" stroke="#3d1f0a" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M38 88 C34 82 30 78 26 76" stroke="#3d1f0a" stroke-width="2" stroke-linecap="round"/>
+
+      <!-- BLOSSOM 1 — right tip, large organic petals -->
+      <path d="M176 11 C173 4 166 2 163 7 C160 4 153 4 152 9 C147 8 144 14 148 18 C145 23 148 28 153 27 C155 32 162 32 164 27 C169 30 175 27 174 22 C179 20 180 14 176 11Z" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.8"/>
+      <circle cx="163" cy="17" r="5.5" fill="#fff" opacity="0.8"/>
+      <circle cx="163" cy="17" r="3" fill="#f5c6d0"/>
+      <line x1="163" y1="17" x2="160" y2="11" stroke="#d4688a" stroke-width="1" stroke-linecap="round"/>
+      <line x1="163" y1="17" x2="166" y2="11" stroke="#d4688a" stroke-width="1" stroke-linecap="round"/>
+      <line x1="163" y1="17" x2="170" y2="16" stroke="#d4688a" stroke-width="1" stroke-linecap="round"/>
+      <line x1="163" y1="17" x2="168" y2="23" stroke="#d4688a" stroke-width="1" stroke-linecap="round"/>
+      <line x1="163" y1="17" x2="157" y2="22" stroke="#d4688a" stroke-width="1" stroke-linecap="round"/>
+      <circle cx="160" cy="10" r="1.6" fill="#d4688a"/>
+      <circle cx="166" cy="10" r="1.6" fill="#d4688a"/>
+      <circle cx="171" cy="15" r="1.6" fill="#d4688a"/>
+      <circle cx="168" cy="24" r="1.6" fill="#d4688a"/>
+      <circle cx="157" cy="23" r="1.6" fill="#d4688a"/>
+
+      <!-- BLOSSOM 2 — left branch tip -->
+      <path d="M22 12 C19 5 12 3 9 8 C6 5 -1 5 -2 10 C-7 9 -10 15 -6 19 C-9 24 -6 29 -1 28 C1 33 8 33 10 28 C15 31 21 28 20 23 C25 21 26 15 22 12Z" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.8"/>
+      <circle cx="9" cy="18" r="5" fill="#fff" opacity="0.8"/>
+      <circle cx="9" cy="18" r="2.8" fill="#f5c6d0"/>
+      <circle cx="6"  cy="12" r="1.5" fill="#d4688a"/>
+      <circle cx="11" cy="11" r="1.5" fill="#d4688a"/>
+      <circle cx="15" cy="16" r="1.5" fill="#d4688a"/>
+      <circle cx="13" cy="23" r="1.5" fill="#d4688a"/>
+      <circle cx="6"  cy="24" r="1.5" fill="#d4688a"/>
+
+      <!-- BLOSSOM 3 — right sub-branch -->
+      <ellipse cx="107" cy="2"  rx="12" ry="7.5" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.9" transform="rotate(-15 107 2)"/>
+      <ellipse cx="116" cy="6"  rx="12" ry="7.5" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.9" transform="rotate(57 116 6)"/>
+      <ellipse cx="114" cy="16" rx="12" ry="7.5" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.9" transform="rotate(129 114 16)"/>
+      <ellipse cx="104" cy="17" rx="12" ry="7.5" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.9" transform="rotate(202 104 17)"/>
+      <ellipse cx="98"  cy="9"  rx="12" ry="7.5" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.9" transform="rotate(275 98 9)"/>
+      <circle cx="107" cy="9" r="5.5" fill="#fff" opacity="0.8"/>
+      <circle cx="107" cy="9" r="3" fill="#f5c6d0"/>
+      <circle cx="104" cy="4"  r="1.5" fill="#d4688a"/>
+      <circle cx="108" cy="3.5" r="1.5" fill="#d4688a"/>
+      <circle cx="112" cy="5"  r="1.5" fill="#d4688a"/>
+      <circle cx="113" cy="10" r="1.5" fill="#d4688a"/>
+      <circle cx="107" cy="14" r="1.5" fill="#d4688a"/>
+
+      <!-- BLOSSOM 4 — drooping tip -->
+      <ellipse cx="86" cy="99"  rx="10" ry="6.5" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.8" transform="rotate(0 86 99)"/>
+      <ellipse cx="94" cy="102" rx="10" ry="6.5" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.8" transform="rotate(72 94 102)"/>
+      <ellipse cx="92" cy="112" rx="10" ry="6.5" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.8" transform="rotate(144 92 112)"/>
+      <ellipse cx="82" cy="111" rx="10" ry="6.5" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.8" transform="rotate(216 82 111)"/>
+      <ellipse cx="79" cy="102" rx="10" ry="6.5" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.8" transform="rotate(288 79 102)"/>
+      <circle cx="86" cy="105" r="5" fill="#fff" opacity="0.8"/>
+      <circle cx="86" cy="105" r="2.8" fill="#f5c6d0"/>
+
+      <!-- Twig blossoms -->
+      <circle cx="150" cy="4" r="7" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.7" opacity="0.9"/>
+      <circle cx="150" cy="4" r="3.5" fill="#fff" opacity="0.8"/>
+      <circle cx="150" cy="4" r="1.8" fill="#f5c6d0"/>
+      <circle cx="27" cy="75" r="6" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.7" opacity="0.85"/>
+      <circle cx="27" cy="75" r="3" fill="#fff" opacity="0.8"/>
+
+      <!-- Buds -->
+      <ellipse cx="76" cy="58" rx="4.5" ry="7.5" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.8" opacity="0.8" transform="rotate(-22 76 58)"/>
+      <ellipse cx="138" cy="24" rx="3.5" ry="6" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.8" opacity="0.7" transform="rotate(14 138 24)"/>
+
+      <!-- Falling petals -->
+      <ellipse cx="142" cy="68" rx="7" ry="4" fill="#f5c6d0" opacity="0.5" transform="rotate(-42 142 68)"/>
+      <ellipse cx="24"  cy="90" rx="6" ry="3.5" fill="#f5c6d0" opacity="0.4" transform="rotate(28 24 90)"/>
+      <ellipse cx="160" cy="50" rx="5" ry="3" fill="#f5c6d0" opacity="0.32" transform="rotate(-58 160 50)"/>
+      <ellipse cx="55"  cy="108" rx="4.5" ry="2.8" fill="#f5c6d0" opacity="0.3" transform="rotate(15 55 108)"/>
+    </svg>
+    <span id="logo-text">ANIMEVAULT</span>
+  </div>
   <select id="lang-select" onchange="setLang(this.value)">
     <option value="de">🇩🇪 Deutsch</option>
     <option value="at">🇦🇹 Österreichisch</option>
@@ -188,6 +263,10 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     <span data-i18n="tab_settings">Design</span>
   </button>
+  <button class="tab" data-tab="import" onclick="switchTab('import')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    <span>Liste einfügen</span>
+  </button>
 </div>
 
 <div id="content">
@@ -205,7 +284,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
       </button>
       <div class="filter-divider"></div>
       <div class="genre-wrap">
-        <button class="filter-btn" id="genre-btn" onclick="toggleGenreDD()">
+        <button class="filter-btn" id="genre-btn" onclick="toggleGenreDD(event)">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
           <span data-i18n="filter_genre">Genre</span>
           <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
@@ -278,19 +357,75 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
         <div class="color-swatches" id="accent-swatches"></div>
         <div class="color-custom"><span data-i18n="custom_color">Eigene Farbe</span><input type="color" id="accent-custom" style="width:38px;height:26px;border:none;background:none;cursor:pointer" oninput="setAccent(this.value)"></div>
       </div>
-      <div>
+      <div style="margin-bottom:22px">
         <div class="settings-label" data-i18n="text_label">Textfarbe</div>
         <div class="color-swatches" id="text-swatches"></div>
         <div class="color-custom"><span data-i18n="custom_color">Eigene Farbe</span><input type="color" id="text-custom" style="width:38px;height:26px;border:none;background:none;cursor:pointer" oninput="setTextColor(this.value)"></div>
       </div>
+      <div>
+        <div class="settings-label">Logo-Farbe</div>
+        <div class="color-swatches" id="logo-swatches"></div>
+        <div class="color-custom"><span>Eigene Farbe</span><input type="color" id="logo-custom" style="width:38px;height:26px;border:none;background:none;cursor:pointer" oninput="setLogoColor(this.value)"></div>
+      </div>
       <div class="settings-preview">
         <div style="font-size:10px;color:#333;margin-bottom:6px" data-i18n="preview">Vorschau</div>
-        <div id="preview-title" style="font-size:14px;font-weight:600">Demon Slayer</div>
-        <div style="font-size:11px;color:#555;margin-top:2px">55 Folgen · Film: Mugen Train</div>
-        <div id="preview-accent" style="font-size:11px;margin-top:2px">↻ Season 4 läuft</div>
+        <div id="preview-title" style="font-size:14px;font-weight:600">Anime Beispiel</div>
+        <div style="font-size:11px;color:#555;margin-top:2px">24 Folgen · Film: Beispielfilm</div>
+        <div id="preview-accent" style="font-size:11px;margin-top:2px">↻ Season 2 angekündigt</div>
       </div>
     </div>
-    <div style="font-size:10px;color:#2a2a2a;margin-top:8px">Dub-Stand: Mai 2026</div>
+    <div style="font-size:10px;color:var(--border2);margin-top:8px">Dub-Stand: Mai 2026</div>
+  </div>
+
+  <!-- LOGO STYLE OPTION -->
+  <div class="settings-box">
+    <div class="settings-label">Logo-Stil</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div id="logo-opt-svg" onclick="setLogoStyle('svg')" style="cursor:pointer;padding:14px 20px;border-radius:8px;border:2px solid var(--accent);background:rgba(212,104,138,.08);display:flex;flex-direction:column;align-items:center;gap:8px">
+        <svg width="60" height="40" viewBox="0 0 180 120" fill="none">
+          <path d="M8 118 C20 105 38 88 60 72 C82 56 108 38 145 22 C158 16 168 13 176 11" stroke="#3d1f0a" stroke-width="6" stroke-linecap="round"/>
+          <path d="M58 74 C46 56 34 36 22 12" stroke="#3d1f0a" stroke-width="4.5" stroke-linecap="round"/>
+          <ellipse cx="107" cy="9" rx="12" ry="7.5" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.9" transform="rotate(-15 107 9)"/>
+          <ellipse cx="116" cy="13" rx="12" ry="7.5" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.9" transform="rotate(57 116 13)"/>
+          <ellipse cx="114" cy="22" rx="12" ry="7.5" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.9" transform="rotate(129 114 22)"/>
+          <ellipse cx="104" cy="23" rx="12" ry="7.5" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.9" transform="rotate(202 104 23)"/>
+          <ellipse cx="98" cy="15" rx="12" ry="7.5" fill="#f5c6d0" stroke="#d4688a" stroke-width="0.9" transform="rotate(275 98 15)"/>
+        </svg>
+        <span style="font-size:11px;color:var(--accent);font-weight:600">SVG Kirschblüte</span>
+      </div>
+      <div id="logo-opt-emoji" onclick="setLogoStyle('emoji')" style="cursor:pointer;padding:14px 20px;border-radius:8px;border:2px solid var(--border);background:var(--card2);display:flex;flex-direction:column;align-items:center;gap:8px">
+        <span style="font-size:36px">🌸</span>
+        <span style="font-size:11px;color:var(--sub);font-weight:600">Emoji</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LISTE EINFÜGEN -->
+  <div class="pane" id="pane-import">
+    <div class="section-label">Liste einfügen</div>
+    <div style="background:#141414;border:1px solid #1e1e1e;border-radius:10px;padding:20px;max-width:600px;margin-bottom:20px">
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px">Format-Regeln</div>
+      <div style="font-size:12px;color:#666;line-height:2.2;background:#0f0f0f;border-radius:8px;padding:14px;font-family:monospace">
+        <span style="color:var(--accent)">[x]</span> Anime Name <span style="color:#444">→ Geschaut-Liste</span><br>
+        <span style="color:#555">[ ] Anime Name</span> <span style="color:#444">→ Watchlist</span><br>
+        <span style="color:#2dc653">[ ] Anime Name 0</span> <span style="color:#444">→ Schau ich gerade (0 am Ende)</span><br>
+        <br>
+        <span style="color:#333">Beispiel:</span><br>
+        <span style="color:var(--accent)">[x]</span> Demon Slayer<br>
+        <span style="color:var(--accent)">[x]</span> Blue Lock<br>
+        [ ] One Piece<br>
+        <span style="color:#2dc653">[ ] Chainsaw Man 0</span>
+      </div>
+      <div style="font-size:11px;color:#333;margin-top:10px">Jede Zeile = ein Anime. Leerzeilen werden ignoriert. Duplikate werden übersprungen.</div>
+    </div>
+    <div style="max-width:600px">
+      <textarea id="import-text" placeholder="Liste hier einfügen..." style="width:100%;height:280px;background:#141414;border:1px solid #2a2a2a;border-radius:8px;color:var(--text);font-size:13px;padding:14px;outline:none;font-family:monospace;resize:vertical;line-height:1.8"></textarea>
+      <div style="display:flex;gap:10px;margin-top:12px">
+        <button onclick="importList()" style="background:var(--accent);border:none;border-radius:7px;padding:11px 24px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Liste importieren</button>
+        <button onclick="document.getElementById('import-text').value='';document.getElementById('import-result').innerHTML=''" style="background:#1e1e1e;border:none;border-radius:7px;padding:11px 18px;color:#666;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Leeren</button>
+      </div>
+      <div id="import-result" style="margin-top:14px;font-size:12px;color:#555;line-height:1.8"></div>
+    </div>
   </div>
 </div>
 
@@ -459,6 +594,53 @@ const STREAMING = {
   "Left Hand Layup":        [{id:"cr",dub:"6"}],
   "Tougen Anki":            [{id:"cr",dub:"13"}],
   "Dead Mount Death Play":  [{id:"cr",dub:"24"}],
+  // MISSING ONES ADDED
+  "Fire Force":             [{id:"cr",dub:"48"}],
+  "Orient":                 [{id:"cr",dub:"24"}],
+  "The Water Magician":     [{id:"cr",dub:"13"}],
+  "Die Tagebücher der Apothekerin":[{id:"cr",dub:"24"}],
+  "The 7th Prince":         [{id:"cr",dub:"12"}],
+  "Kuroko's Basketball":    [{id:"cr",dub:"75"}],
+  "Reincarnated as a Sword":[{id:"cr",dub:"12"}],
+  "Suzume":                 [{id:"cr",dub:"0"},{id:"prime",dub:"0"}],
+  "Akashic Records of Bastard Magic Instructor":[{id:"cr",dub:"13"}],
+  "Avatar: Der Herr der Elemente + Korra":[{id:"prime",dub:"232"},{id:"netflix",dub:"232"}],
+  "Demon Slayer":           [{id:"cr",dub:"55"},{id:"netflix",dub:"26"},{id:"prime",dub:"26"}],
+  "I've Been Killing Slimes for 300 Years":[{id:"cr",dub:"12"}],
+  "The Quintessential Quintuplets":[{id:"cr",dub:"24"},{id:"netflix",dub:"12"}],
+  "The World's Finest Assassin":[{id:"cr",dub:"12"},{id:"prime",dub:"12"}],
+  "My Dress-Up Darling":    [{id:"cr",dub:"12"},{id:"disney",dub:"12"}],
+  "Attack on Titan":        [{id:"cr",dub:"89"},{id:"netflix",dub:"89"},{id:"prime",dub:"89"}],
+  "Fullmetal Alchemist: Brotherhood":[{id:"cr",dub:"64"},{id:"netflix",dub:"64"},{id:"prime",dub:"64"}],
+  "My Hero Academia":       [{id:"cr",dub:"138"},{id:"netflix",dub:"76"}],
+  "Re:Zero":                [{id:"cr",dub:"50"},{id:"prime",dub:"25"}],
+  "Overlord":               [{id:"cr",dub:"52"},{id:"prime",dub:"13"}],
+  "Konosuba":               [{id:"cr",dub:"20"},{id:"prime",dub:"10"}],
+  "Spy x Family":           [{id:"cr",dub:"37"},{id:"prime",dub:"25"}],
+  "Mushoku Tensei":         [{id:"cr",dub:"23"},{id:"prime",dub:"11"}],
+  "Mob Psycho 100":         [{id:"cr",dub:"37"},{id:"netflix",dub:"13"}],
+  "One Punch Man":          [{id:"cr",dub:"24"},{id:"netflix",dub:"24"}],
+  "Steins;Gate":            [{id:"cr",dub:"24"},{id:"prime",dub:"24"}],
+  "Violet Evergarden":      [{id:"cr",dub:"13"},{id:"netflix",dub:"13"}],
+  "Bleach":                 [{id:"cr",dub:"~200"},{id:"disney",dub:"~200"}],
+  "Naruto Shippuden":       [{id:"cr",dub:"~500"}],
+  "Dragon Ball Super":      [{id:"cr",dub:"131"}],
+  "No Game No Life":        [{id:"cr",dub:"12"}],
+  "Tower of God":           [{id:"cr",dub:"26"}],
+  "Mashle":                 [{id:"cr",dub:"24"}],
+  "Lycoris Recoil":         [{id:"cr",dub:"13"}],
+  "Bocchi the Rock":        [{id:"cr",dub:"12"}],
+  "Fruits Basket":          [{id:"cr",dub:"63"},{id:"prime",dub:"25"}],
+  "Parasyte":               [{id:"cr",dub:"24"},{id:"netflix",dub:"24"}],
+  "Black Butler":           [{id:"cr",dub:"24"},{id:"netflix",dub:"24"}],
+  "Soul Eater":             [{id:"cr",dub:"51"}],
+  "Neon Genesis Evangelion":[{id:"netflix",dub:"26"}],
+  "Kill la Kill":           [{id:"cr",dub:"24"},{id:"netflix",dub:"24"}],
+  "Gurren Lagann":          [{id:"cr",dub:"27"},{id:"netflix",dub:"27"}],
+  "Puella Magi Madoka Magica":[{id:"cr",dub:"12"},{id:"prime",dub:"12"}],
+  "Rent-A-Girlfriend":      [{id:"cr",dub:"24"}],
+  "Komi Can't Communicate": [{id:"netflix",dub:"24"}],
+  "Undead Unluck":          [{id:"cr",dub:"24"}],
 };
 
 // SVG Icons for streaming providers — no external images needed
@@ -616,7 +798,7 @@ let state = {
   watchlist:       ld('watchlist',INIT_WATCHLIST),
   favorites:       ld('favorites',[]),
   recommendations: ld('recommendations',[]),
-  accentColor:     localStorage.getItem('accent')||'#e85d04',
+  accentColor:     localStorage.getItem('accent')||'#d4688a',
   textColor:       localStorage.getItem('textcol')||'#f0e6d3',
 };
 let sortMode='az', selectedGenres=[];
@@ -859,8 +1041,8 @@ async function openDetail(listKey, id) {
 // FILTER
 // ═══════════════════════════════════════════════════════════════════════════════
 function setSort(m){sortMode=m;document.getElementById('sort-az').classList.toggle('active',m==='az');document.getElementById('sort-ep').classList.toggle('active',m==='ep');renderCompleted();}
-function toggleGenreDD(){document.getElementById('genre-dropdown').classList.toggle('show');}
-function buildGenreGrid(){document.getElementById('genre-grid').innerHTML=GENRES.map(g=>`<div class="genre-chip${selectedGenres.includes(g)?' selected':''}" onclick="toggleGenre('${g}')">${g}</div>`).join('');document.getElementById('genre-btn').classList.toggle('active',selectedGenres.length>0);}
+function toggleGenreDD(e){e && e.stopPropagation(); document.getElementById('genre-dropdown').classList.toggle('show');}
+function buildGenreGrid(){document.getElementById('genre-grid').innerHTML=GENRES.map(g=>`<div class="genre-chip${selectedGenres.includes(g)?' selected':''}" onclick="event.stopPropagation();toggleGenre('${g}')">${g}</div>`).join('');document.getElementById('genre-btn').classList.toggle('active',selectedGenres.length>0);}
 function toggleGenre(g){if(selectedGenres.includes(g))selectedGenres=selectedGenres.filter(x=>x!==g);else selectedGenres.push(g);buildGenreGrid();renderCompleted();}
 function clearGenres(){selectedGenres=[];buildGenreGrid();renderCompleted();}
 
@@ -997,17 +1179,60 @@ document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',func
 // ═══════════════════════════════════════════════════════════════════════════════
 // SETTINGS
 // ═══════════════════════════════════════════════════════════════════════════════
-const ACC=['#e85d04','#c1121f','#0077b6','#2dc653','#8338ec','#ff006e','#ffbe0b','#00b4d8'];
-const TXT=['#f0e6d3','#ffffff','#d4d4d4','#a8d8a8','#ffd6a5','#bde0fe','#ffccd5'];
+let logoStyle = localStorage.getItem('logostyle') || 'svg';
+
+function setLogoStyle(style) {
+  logoStyle = style;
+  localStorage.setItem('logostyle', style);
+  applyLogoStyle();
+  // Update button borders in settings
+  const svgOpt = document.getElementById('logo-opt-svg');
+  const emojiOpt = document.getElementById('logo-opt-emoji');
+  if (svgOpt && emojiOpt) {
+    svgOpt.style.borderColor = style === 'svg' ? 'var(--accent)' : 'var(--border)';
+    svgOpt.style.background = style === 'svg' ? 'rgba(212,104,138,.08)' : 'var(--card2)';
+    emojiOpt.style.borderColor = style === 'emoji' ? 'var(--accent)' : 'var(--border)';
+    emojiOpt.style.background = style === 'emoji' ? 'rgba(212,104,138,.08)' : 'var(--card2)';
+  }
+}
+
+function applyLogoStyle() {
+  const icon = document.getElementById('logo-icon');
+  if (!icon) return;
+  if (logoStyle === 'emoji') {
+    icon.innerHTML = '🌸';
+    icon.style.cssText = 'font-size:26px;flex-shrink:0;line-height:1';
+  } else {
+    // Restore SVG — just reload the page's stored SVG
+    icon.style.cssText = 'flex-shrink:0';
+    // SVG is already in DOM from HTML, only change if switching from emoji
+    if (icon.innerHTML === '🌸') location.reload();
+  }
+}
+
+const ACC=['#d4688a','#e85d04','#c1121f','#0077b6','#2dc653','#8338ec','#ff006e','#ffbe0b'];
+const TXT=['#f0e6d3','#ffffff','#d4d4d4','#e8c4c4','#ffd6a5','#bde0fe','#ffccd5'];
+const LOGO_COLORS=['#d4688a','#e85d04','#ff006e','#ffbe0b','#2dc653','#00b4d8','#8338ec','#ffffff'];
+let logoColor = localStorage.getItem('logocolor') || '#d4688a';
+
 function buildSwatches(){
   document.getElementById('accent-swatches').innerHTML=ACC.map(c=>`<div class="swatch${c===state.accentColor?' selected':''}" style="background:${c}" onclick="setAccent('${c}')"></div>`).join('');
   document.getElementById('text-swatches').innerHTML=TXT.map(c=>`<div class="swatch${c===state.textColor?' selected':''}" style="background:${c};outline-color:${c===state.textColor?state.accentColor:'transparent'}" onclick="setTextCol('${c}')"></div>`).join('');
+  document.getElementById('logo-swatches').innerHTML=LOGO_COLORS.map(c=>`<div class="swatch${c===logoColor?' selected':''}" style="background:${c};outline-color:${c===logoColor?state.accentColor:'transparent'}" onclick="setLogoColor('${c}')"></div>`).join('');
   document.getElementById('accent-custom').value=state.accentColor;
   document.getElementById('text-custom').value=state.textColor;
+  if(document.getElementById('logo-custom')) document.getElementById('logo-custom').value=logoColor;
 }
 function setAccent(c){state.accentColor=c;localStorage.setItem('accent',c);buildSwatches();renderAll();}
 function setTextColor(c){state.textColor=c;localStorage.setItem('textcol',c);buildSwatches();renderAll();}
 function setTextCol(c){setTextColor(c);}
+function setLogoColor(c){logoColor=c;localStorage.setItem('logocolor',c);buildSwatches();applyLogoColor();}
+function applyLogoColor(){
+  const icon = document.getElementById('logo-icon');
+  const text = document.getElementById('logo-text');
+  if(icon) icon.style.setProperty('--accent', logoColor);
+  if(text) text.style.color = logoColor;
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TABS
@@ -1021,11 +1246,64 @@ let toastTimer=null;
 function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.style.display='block';clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.display='none',2600);}
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// LIST IMPORT
+// ═══════════════════════════════════════════════════════════════════════════════
+function importList() {
+  const raw = document.getElementById('import-text').value;
+  const lines = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  const taken = allTitles();
+  let addedCompleted = 0, addedWatchlist = 0, addedOngoing = 0, skipped = 0;
+
+  lines.forEach(line => {
+    const checkedMatch = line.match(/^\[x\]\s+(.+)$/i);
+    const uncheckedMatch = line.match(/^\[\s\]\s+(.+)$/i);
+
+    if (checkedMatch) {
+      let title = checkedMatch[1].trim();
+      if (taken.includes(title.toLowerCase())) { skipped++; return; }
+      state.completed.push({id: Date.now() + Math.random(), title, episodes: '?', films: []});
+      taken.push(title.toLowerCase());
+      addedCompleted++;
+    } else if (uncheckedMatch) {
+      let title = uncheckedMatch[1].trim();
+      const isOngoing = title.endsWith(' 0');
+      if (isOngoing) title = title.slice(0, -2).trim();
+      if (taken.includes(title.toLowerCase())) { skipped++; return; }
+      if (isOngoing) {
+        state.ongoing.push({id: Date.now() + Math.random(), title, episodes: '?', films: [], continuation: 'Gerade angefangen'});
+        addedOngoing++;
+      } else {
+        state.watchlist.push({id: Date.now() + Math.random(), title, episodes: '?', films: []});
+        addedWatchlist++;
+      }
+      taken.push(title.toLowerCase());
+    }
+  });
+
+  sv('completed'); sv('ongoing'); sv('watchlist');
+  renderAll();
+
+  const res = document.getElementById('import-result');
+  res.innerHTML = `
+    <div style="background:#141414;border:1px solid #1e1e1e;border-radius:8px;padding:14px">
+      <div style="color:var(--accent);font-weight:700;margin-bottom:8px">Import abgeschlossen</div>
+      ${addedCompleted > 0 ? `<div>✓ ${addedCompleted} → Abgeschlossen</div>` : ''}
+      ${addedWatchlist > 0 ? `<div>✓ ${addedWatchlist} → Watchlist</div>` : ''}
+      ${addedOngoing  > 0 ? `<div>✓ ${addedOngoing} → Schau ich gerade</div>` : ''}
+      ${skipped > 0 ? `<div style="color:#444">⊘ ${skipped} übersprungen (bereits vorhanden)</div>` : ''}
+      ${addedCompleted+addedWatchlist+addedOngoing === 0 ? '<div style="color:#444">Keine neuen Anime gefunden. Format prüfen.</div>' : ''}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════════
 buildGenreGrid();
 buildSwatches();
 applyI18n();
+applyLogoColor();
+applyLogoStyle();
+setLogoStyle(logoStyle);
 renderAll();
 </script>
 </body>
